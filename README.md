@@ -161,8 +161,7 @@ re_ad:        the directory of saved model, default "/home/chenziwei2021/pyn/pap
 ## Problems and Solutions
 
 ### 0. Universal method
-There are two **violent** methods that can solve most bugs. So you should use them with caution.
-
+There are two **violent** methods that can solve most bugs. So you should use them with caution.<br>
 
 - **Extremely Violent**:<br>
 Remove the web project. For Linux system, firstly make sure you have backed up all files (excluding temporary files), then
@@ -170,8 +169,7 @@ Remove the web project. For Linux system, firstly make sure you have backed up a
 cd ..
 rm -rf web
 ```
-Upload files to background system, and start over from the first step in [Program Description](#section-begin)
-
+Upload files to background system, and start over from the first step in [Program Description](#section-begin)<br>
 
 - **Not so violent**:<br>
 Remove the db.sqlite3 file. For Linux system, you can
@@ -183,6 +181,7 @@ Re-execute the command to generate Django database, then restart the server
 python manager migrate
 python manager runserver
 ```
+<br>
 
 
 ### 1. Testing model without Training
