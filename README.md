@@ -18,10 +18,10 @@ Then, there are some Python packages need to be installed<br>
 ## Dataset Preparation
 The Dataset used in our paper can be downloaded from [https://github.com/smousavi05/STEAD](https://github.com/smousavi05/STEAD).
 
-![image](https://github.com/czw1296924847/MagInfoNet/blob/main/dataset_structure.png)
+![image](https://github.com/czw1296924847/MagInfoNet/blob/main/image/dataset_structure.png)
 
 ## Program Description
-Firstly please go to the directory where [manager.py]() is located, and then do other actions.
+Firstly please go to the directory where [manager.py](https://github.com/czw1296924847/EQ-Web/blob/main/manage.py) is located, and then do other actions.
 
 ### Generating Django Model
 `python manager.py makemigrations`<br>
