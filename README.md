@@ -7,13 +7,15 @@ EQ-Web is based on [Django](https://docs.djangoproject.com) and [Django REST fra
 Firstly please create a virtual environment for yourself<br>
 `conda create -n your-env-name python=3.9`<br><br>
 Then, there are some Python packages need to be installed<br>
-`conda install pytorch torchvision torchaudio cudatoolkit=11.3`<br>
-`conda install pyg -c pyg`<br>
-`conda install h5py==2.10.0`<br>
-`conda install django`<br>
-`conda install djangorestframework`<br>
-`conda install markdown`<br>
-`conda install django-filter`<br>
+```
+conda install pytorch torchvision torchaudio cudatoolkit=11.3
+conda install pyg -c pyg
+conda install h5py==2.10.0
+conda install django
+conda install djangorestframework
+conda install markdown
+conda install django-filter
+```
 
 ## Dataset Preparation
 The Dataset used in our paper can be downloaded from [https://github.com/smousavi05/STEAD](https://github.com/smousavi05/STEAD).
@@ -26,8 +28,12 @@ Firstly please go to the directory where [manager.py](https://github.com/czw1296
 ### Generating Django Model
 `python manager.py makemigrations`<br>
 `python manager.py migrate`<br>
-
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/generate_model.png)<br>
+We have defined three Django Models, including<br>
+EndPoint <br>
+MagModel<br>
+MagStatus<br>
+MagRequest<br>
 
 ### Starting Service
 `python manager.py runserver`<br>
