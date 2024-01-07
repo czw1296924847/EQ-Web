@@ -37,11 +37,14 @@ python manager.py migrate
 We have defined three Django Models, including<br>
 - **EndPoint**:<br>
 API endpoints,       including `name`, `owner`, `created_at` <br>
-- **MagModel**:
+
+- **MagModel**:<br>
 Model information,   including `name`, `description`, `code`, `version`, `owner`, `created_at`, `parent_endpoints` <br>
-- **MagStatus**:
+
+- **MagStatus**:<br>
 Model status,       including `status`, `active`, `created_by`, `parent_model` <br>
-- **MagRequest**:
+
+- **MagRequest**:<br>
 Requests to model,   including `input_data`, `full_response`, `response`, `feedback`, `created_by`, `parent_model`
 
 
