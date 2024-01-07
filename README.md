@@ -28,7 +28,7 @@ The Dataset used in our paper can be downloaded from [https://github.com/smousav
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/dataset_structure.png)<br>
 
 ## Program Description
-Firstly please go to the directory where [manager.py](https://github.com/czw1296924847/EQ-Web/blob/main/manage.py) is located, and then do other actions.
+<a name="section-begin"></a> Firstly please go to the directory where [manager.py](https://github.com/czw1296924847/EQ-Web/blob/main/manage.py) is located, and then do other actions.
 
 ### 1. Generating Django Model
 ```
@@ -159,6 +159,17 @@ re_ad:        the directory of saved model, default "/home/chenziwei2021/pyn/pap
 ```
 
 ## Problems and Solutions
+
+### 0. Universal method
+There are two **violent** methods that can solve most bugs. So you should use them with caution.
+
+#### 0.1 Extremely Violent
+Remove the web project. For Linux system, firstly make sure you have backed up all files (excluding temporary files), then
+```
+cd ..
+rm -rf web
+```
+Upload files to background system, and start over from the first step in [Program Description](#section-begin)
 
 ### 1. Testing model without Training
 If you have not trained the model before testing, you will <br>
