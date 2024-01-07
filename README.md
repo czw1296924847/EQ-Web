@@ -47,6 +47,7 @@ For Linux system, you can access web pages by using <br>
 ```
 xdg-open http://{host}:{port}
 ```
+then you will see <br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/root_page.png)
 In our example, host = 127.0.0.1 and port = 8000.
 
@@ -73,12 +74,9 @@ and provide example JSON input:
 }
 ```
 and click the $\text{\color{blue}{POST}}$ button, the model starts training <br>
-After a period of time (possibly a long time, based on the amount of data and model parameters), you should see views like <br>
-
+After a period of time (maybe a long time for model training), you should see <br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_after.png)<br>
-
-You can view the model training process in the background <br>
-
+You can view the model training process in background system <br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_process.png)
 
 ### 5. Testing Model
@@ -103,12 +101,10 @@ and provide example JSON input:
     "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
 }
 ```
-and click the $\text{\color{blue}{POST}}$ button, the model starts testing, and after a shorter period of time, you should see views like <br>
-
+and click the $\text{\color{blue}{POST}}$ button, the model starts testing <br>
+After a shorter period of time, you should see views like <br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_after.png)<br>
-
-You can view the model testing process in the background <br>
-
+You can view the model testing process in background system <br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_process.png)<br>
 
 
