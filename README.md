@@ -19,3 +19,13 @@ Then, there are some Python packages need to be installed<br>
 The Dataset used in our paper can be downloaded from [https://github.com/smousavi05/STEAD](https://github.com/smousavi05/STEAD).
 
 ![image](https://github.com/czw1296924847/MagInfoNet/blob/main/dataset_structure.png)
+
+## Program Description
+Firstly please go to the directory where [manager.py]() is located, and then do other actions.
+
+### Generating Django Model
+`python manager.py makemigrations`<br>
+`python manager.py migrate`<br>
+
+### Starting Service
+`python manager.py runserver`<br>
