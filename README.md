@@ -55,6 +55,7 @@ Go to `http://127.0.0.1:8000/estimate/magnitude_estimator/train` <br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_before.png)<br>
 
 and provide example JSON input:
+```
 {
     "network": "CREIME",
     "device": "cuda:1",
@@ -69,6 +70,7 @@ and provide example JSON input:
     "root": "/home/chenziwei2021/standford_dataset",
     "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
 }
+```
 and click the POST button, the model starts training, and after a period of time (possibly a long time, based on the amount of data and model parameters), you should see views like <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_after.png)<br>
@@ -83,7 +85,7 @@ After training some model, go to `http://127.0.0.1:8000/estimate/magnitude_estim
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_before.png)<br>
 
 and provide example JSON input:
-{
+```{
     "network": "CREIME",
     "device": "cuda:1",
     "lr": 0.0005,
@@ -96,7 +98,7 @@ and provide example JSON input:
     "name": "chunk2",
     "root": "/home/chenziwei2021/standford_dataset",
     "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
-}
+}```
 and click the POST button, the model starts testing, and after a shorter period of time, you should see views like <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_after.png)<br>
