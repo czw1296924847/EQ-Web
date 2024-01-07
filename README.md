@@ -163,7 +163,7 @@ re_ad:        the directory of saved model, default "/home/chenziwei2021/pyn/pap
 ### 0. Universal method
 There are two **violent** methods that can solve most bugs. So you should use them with caution.<br>
 
-- **Extremely Violent**:<br>
+### 0.1 Extremely Violent
 Remove the web project. For Linux system, firstly make sure you have backed up all files (excluding temporary files), then
 ```
 cd ..
@@ -171,7 +171,7 @@ rm -rf web
 ```
 Upload files to background system, and start over from the first step in [Program Description](#section-begin)<br>
 
-- **Not so violent**:<br>
+### 0.2 Not so violent
 Remove the db.sqlite3 file. For Linux system, you can
 ```
 rm db.sqlite3
