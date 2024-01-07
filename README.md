@@ -18,7 +18,7 @@ Then, there are some Python packages need to be installed<br>
 ## Dataset Preparation
 The Dataset used in our paper can be downloaded from [https://github.com/smousavi05/STEAD](https://github.com/smousavi05/STEAD).
 
-![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/dataset_structure.png)
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/dataset_structure.png)<br>
 
 ## Program Description
 Firstly please go to the directory where [manager.py](https://github.com/czw1296924847/EQ-Web/blob/main/manage.py) is located, and then do other actions.
@@ -27,5 +27,74 @@ Firstly please go to the directory where [manager.py](https://github.com/czw1296
 `python manager.py makemigrations`<br>
 `python manager.py migrate`<br>
 
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/generate_model.png)<br>
+
 ### Starting Service
 `python manager.py runserver`<br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/run_server.png)<br>
+
+### Accessing Web and Entering Root Page
+You can access web pages on a Linux system using<br>
+`xdg-open http://[host]:[port]`<br>
+In our example, host = 127.0.0.1 and port = 8000, then you can see <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/root_page.png)<br>
+
+### Training Model
+Go to `http://127.0.0.1:8000/estimate/magnitude_estimator/train` <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_before.png)<br>
+
+and provide example JSON input:
+{
+    "network": "CREIME",
+    "device": "cuda:1",
+    "lr": 0.0005,
+    "decay": 0.0005,
+    "batch_size": 64,
+    "epochs": 100,
+    "train_ratio": 0.75,
+    "m": 100,
+    "sm_scale": ["ml"],
+    "name": "chunk2",
+    "root": "/home/chenziwei2021/standford_dataset",
+    "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
+}
+and click the POST button, the model starts training, and after a period of time (possibly a long time, based on the amount of data and model parameters), you should see views like <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_after.png)<br>
+
+You can view the model training process in the background <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_process.png)<br>
+
+### Testing Model
+After training some model, go to `http://127.0.0.1:8000/estimate/magnitude_estimator/test` <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_before.png)<br>
+
+and provide example JSON input:
+{
+    "network": "CREIME",
+    "device": "cuda:1",
+    "lr": 0.0005,
+    "decay": 0.0005,
+    "batch_size": 64,
+    "epochs": 100,
+    "train_ratio": 0.75,
+    "m": 100,
+    "sm_scale": ["ml"],
+    "name": "chunk2",
+    "root": "/home/chenziwei2021/standford_dataset",
+    "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
+}
+and click the POST button, the model starts testing, and after a shorter period of time, you should see views like <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_after.png)<br>
+
+You can view the model testing process in the background <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_process.png)<br>
+
+## Problems and Solutions
