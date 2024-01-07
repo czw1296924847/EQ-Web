@@ -111,10 +111,12 @@ You can view the model testing process in the background <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_process.png)<br>
 
+
 ## Problems and Solutions
+
 ### Testing model without Training
-If you have not trained the model before testing, you will <br>
-![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/not_train.png)<br>
+If you have not trained the model before testing, you will <br><br>
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/not_train.png)<br><br>
 where the `CREIME` haven't been trained.
 
 ## Extension
