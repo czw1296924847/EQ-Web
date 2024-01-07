@@ -91,7 +91,7 @@ In our example, host = 127.0.0.1 and port = 8000.
 and provide example JSON input:
 ```
 {
-    "network": "CREIME",
+    "network": "EQGraphNet",
     "device": "cuda:1",
     "lr": 0.0005,
     "decay": 0.0005,
