@@ -35,10 +35,10 @@ python manager.py migrate
 ```
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/generate_model.png)<br>
 We have defined three Django Models, including<br>
-- EndPoint Our endpoints, including `name`, `owner`, `created_at`
-- MagModel Our Model
-- MagStatus
-- MagRequest
+- **EndPoint** API endpoints, including `name`, `owner`, `created_at`
+- **MagModel** Model information, including `name`, `description`, `code`, `version`, `owner`, `created_at`, `parent_endpoints`
+- **MagStatus** Model status, including `status`, `active`, `created_by`, `parent_model` 
+- **MagRequest** Requests to model, including `input_data`, `full_response`, `response`, `feedback`, `created_by`, `parent_model`
 
 
 ### 2. Starting Service
