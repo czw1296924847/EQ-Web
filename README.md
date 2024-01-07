@@ -25,7 +25,7 @@ The Dataset used in our paper can be downloaded from [https://github.com/smousav
 ## Program Description
 Firstly please go to the directory where [manager.py](https://github.com/czw1296924847/EQ-Web/blob/main/manage.py) is located, and then do other actions.
 
-### Generating Django Model
+### 1. Generating Django Model
 ```
 python manager.py makemigrations
 python manager.py migrate
@@ -37,12 +37,12 @@ We have defined three Django Models, including<br>
 - MagStatus
 - MagRequest
 
-### Starting Service
+### 2. Starting Service
 `python manager.py runserver`<br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/run_server.png)<br>
 
-### Accessing Web and Entering Root Page
+### 3. Accessing Web and Entering Root Page
 For Linux system, you can access web pages by using <br>
 ```
 xdg-open http://{host}:{port}
@@ -50,7 +50,7 @@ xdg-open http://{host}:{port}
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/root_page.png)
 In our example, host = 127.0.0.1 and port = 8000.
 
-### Training Model
+### 4. Training Model
 Go to `http://127.0.0.1:8000/estimate/magnitude_estimator/train` <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_before.png)<br>
@@ -81,7 +81,7 @@ You can view the model training process in the background <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_process.png)
 
-### Testing Model
+### 5. Testing Model
 After training some model, go to `http://127.0.0.1:8000/estimate/magnitude_estimator/test` <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_before.png)<br>
@@ -114,9 +114,9 @@ You can view the model testing process in the background <br>
 
 ## Problems and Solutions
 
-### Testing model without Training
-If you have not trained the model before testing, you will <br><br>
-![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/not_train.png)<br><br>
+### 1. Testing model without Training
+If you have not trained the model before testing, you will <br>
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/not_train.png)<br>
 where the `CREIME` haven't been trained.
 
 ## Extension
