@@ -72,14 +72,14 @@ and provide example JSON input:
     "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
 }
 ```
-and click the POST $\color{red}{POST}$ button, the model starts training <br>
+and click the $\text{\color{blue}{POST}}$ button, the model starts training <br>
 After a period of time (possibly a long time, based on the amount of data and model parameters), you should see views like <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_after.png)<br>
 
 You can view the model training process in the background <br>
 
-![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_process.png)<br>
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_process.png)
 
 ### Testing Model
 After training some model, go to `http://127.0.0.1:8000/estimate/magnitude_estimator/test` <br>
@@ -103,7 +103,7 @@ and provide example JSON input:
     "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
 }
 ```
-and click the POST button, the model starts testing, and after a shorter period of time, you should see views like <br>
+and click the $\text{\color{blue}{POST}}$ button, the model starts testing, and after a shorter period of time, you should see views like <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_after.png)<br>
 
@@ -112,6 +112,10 @@ You can view the model testing process in the background <br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_process.png)<br>
 
 ## Problems and Solutions
+### Testing model without Training
+If you have not trained the model before testing, you will <br>
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/not_train.png)<br>
+where the `CREIME` haven't been trained.
 
 ## Extension
 If you plan to make your own models and data, you can take the following steps <br>
