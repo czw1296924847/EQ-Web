@@ -17,6 +17,7 @@ conda install django
 conda install djangorestframework
 conda install markdown
 conda install django-filter
+conda install tqdm
 ```
 
 
@@ -137,14 +138,39 @@ You can view the model testing process in background system <br>
 
 ### 1. Testing model without Training
 If you have not trained the model before testing, you will <br>
+
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/not_train.png)<br>
+
 where the `CREIME` haven't been trained.
 
 ## Extension
 If you plan to make your own models and data, you can take the following steps <br>
 
-### ?. Defining Model Structure
+### 1. Defining Your Model Structure
 Define your own model structure in [net.py](https://github.com/czw1296924847/EQ-Web/blob/main/func/net.py) <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/net.png)<br>
+
+### 2. Serving Your Model
+Implement your model code in [network.py](https://github.com/czw1296924847/EQ-Web/blob/main/estimate/network.py) <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/network.png)<br>
+
+EQ-Web provide a class by defining 4 functions: `pre_train`, `training`, `pre_test`, `testing` , ``. Of course, you can choose better approaches <br>
+
+- **pre_train**:<br>
+include  <br>
+
+- **training**:<br>
+include  <br>
+
+- **pre_test**:<br>
+include  <br>
+
+- **testing**:<br>
+include <br>
 
 ### ?. Registrying Your Model
 Do not forget to registry your model in [wsgi.py](https://github.com/czw1296924847/EQ-Web/blob/main/web/wsgi.py) <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/wsgi.png)<br>
