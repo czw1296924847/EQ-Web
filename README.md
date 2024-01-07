@@ -150,16 +150,16 @@ You can view the model testing process in background system <br>
 ### 6. Explain Meaning of Parameters
 ```
 network:      the used model, including "EQGraphNet", "MagInfoNet", "MagNet", "ConvNetQuakeINGV", "CREIME"
-device:       including "cpu", "cuda:0", "cuda:1"
+device:       the device of Pytorch model, including "cpu", "cuda:0", "cuda:1"
 lr:           the learning rate of model training, default 0.0005
 decay:        the weight decay of model training, default 0.0005
 batch_size:   batch number for Dataloader, default 64
 train_ratio:  ration of training set, default 0.75
-m:            the number of data set (all)
+m:            the number of data set, defalut 200000
 sm_scale:     magnitude scale, including ["ml"], ["md"], ["ml", "md"]
 name:         the name of STEAD chunk, including "chunk2", "chunk3", "chunk4"
-root:         the directory of data set
-re_ad:        the directory of saved model
+root:         the directory of data set, defalut "/home/chenziwei2021/standford_dataset"
+re_ad:        the directory of saved model, default "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
 ```
 
 ## Problems and Solutions
