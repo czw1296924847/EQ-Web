@@ -123,7 +123,7 @@ You can view the model training process in background system <br>
 and provide example JSON input:
 ```
 {
-    "network": "CREIME",
+    "network": "EQGraphNet",
     "device": "cuda:1",
     "lr": 0.0005,
     "decay": 0.0005,
