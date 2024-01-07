@@ -26,14 +26,16 @@ The Dataset used in our paper can be downloaded from [https://github.com/smousav
 Firstly please go to the directory where [manager.py](https://github.com/czw1296924847/EQ-Web/blob/main/manage.py) is located, and then do other actions.
 
 ### Generating Django Model
-`python manager.py makemigrations`<br>
-`python manager.py migrate`<br>
+```
+python manager.py makemigrations
+python manager.py migrate
+```
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/generate_model.png)<br>
 We have defined three Django Models, including<br>
-EndPoint <br>
-MagModel<br>
-MagStatus<br>
-MagRequest<br>
+- EndPoint
+- MagModel
+- MagStatus
+- MagRequest
 
 ### Starting Service
 `python manager.py runserver`<br>
