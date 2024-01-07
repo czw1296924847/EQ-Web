@@ -2,8 +2,6 @@
 EQ-Web is a web project used for seismology including magnitude estimation and so on. <br>
 But in reality, EQ-Web can be extended to any deep learning or machine learning models. <br>
 
-#<a name="section-1"></a> Section 1
-[Section 1](#section-1)
 
 ## Installation
 EQ-Web is based on [Django](https://docs.djangoproject.com) and [Django REST framework](https://www.django-rest-framework.org/). You can obtain relevant tutorials from [Machine Learning with Django](https://www.deploymachinelearning.com/).<br>
@@ -72,8 +70,9 @@ then you will see <br>
 
 In our example, host = 127.0.0.1 and port = 8000.
 
+
 ### 4. Training Model
-Go to `http://127.0.0.1:8000/estimate/magnitude_estimator/train` <br>
+<a name="section-train"></a>  Go to `http://127.0.0.1:8000/estimate/magnitude_estimator/train` <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_before.png)<br>
 
@@ -159,7 +158,7 @@ Define your own model structure in [net.py](https://github.com/czw1296924847/EQ-
 Implement your model code in [network.py](https://github.com/czw1296924847/EQ-Web/blob/main/estimate/network.py) <br>
 EQ-Web provide a class by defining 4 functions: `pre_train`, `training`, `pre_test`, `testing`. Of course, you can choose better approaches. <br>
 
-- **pre_train**: Obtain parameters required before training. This is related to the format of input JSON to `estimate/magnitude_estimator/test` <br>
+- **pre_train**: Obtain parameters required before training. This is related to the format of input JSON to [Section train](#section-train) <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/pre_train.png)<br>
 
