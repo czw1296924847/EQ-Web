@@ -171,9 +171,9 @@ Implement your model code in [network.py](https://github.com/czw1296924847/EQ-We
 EQ-Web provide a class by defining: `pre_train`, `training`, `pre_test`, `testing`. Of course, you can choose better approaches. <br>
 
 #### Parameter Initialization
-Before modifying, please confirm all of used parameters. For example, if you don't want to know the directory of model and data, fix their values and retrieve them from `pre_train1 and `pre_test` <br>
+Before modifying, please confirm all of used parameters. For example, if you don't want to know the directory of model and data, fix their values and retrieve them from `pre_train` and `pre_test` <br>
 
-![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/pre_train.png)<br>
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/init.png)<br>
 
 
 - **pre_train**: Obtain parameters required before training. This is related to the format of input JSON to [4. Training Model](#section-train) <br>
