@@ -72,7 +72,7 @@ and provide example JSON input:
     "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
 }
 ```
-and click the POST${\color{red}POST}$ button, the model starts training <br>
+and click the POST $\color{red}{POST}$ button, the model starts training <br>
 After a period of time (possibly a long time, based on the amount of data and model parameters), you should see views like <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_after.png)<br>
