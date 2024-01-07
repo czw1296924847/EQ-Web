@@ -44,9 +44,9 @@ We have defined three Django Models, including<br>
 
 ### Accessing Web and Entering Root Page
 For Linux system, you can access web pages by using <br>
-'''
+```
 xdg-open http://{host}:{port}
-'''
+```
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/root_page.png)
 In our example, host = 127.0.0.1 and port = 8000.
 
@@ -72,7 +72,7 @@ and provide example JSON input:
     "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
 }
 ```
-and click the POST button, the model starts training <br>
+and click the POST${\color{red}POST}$ button, the model starts training <br>
 After a period of time (possibly a long time, based on the amount of data and model parameters), you should see views like <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_after.png)<br>
