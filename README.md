@@ -154,21 +154,27 @@ Define your own model structure in [net.py](https://github.com/czw1296924847/EQ-
 ### 2. Serving Your Model
 Implement your model code in [network.py](https://github.com/czw1296924847/EQ-Web/blob/main/estimate/network.py) <br>
 
-![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/network.png)<br>
-
 EQ-Web provide a class by defining 4 functions: `pre_train`, `training`, `pre_test`, `testing` , ``. Of course, you can choose better approaches <br>
 
 - **pre_train**:<br>
 include  <br>
 
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/pre_train.png)<br>
+
 - **training**:<br>
 include  <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/training.png)<br>
 
 - **pre_test**:<br>
 include  <br>
 
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/pre_test.png)<br>
+
 - **testing**:<br>
 include <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/testing.png)<br>
 
 ### ?. Registrying Your Model
 Do not forget to registry your model in [wsgi.py](https://github.com/czw1296924847/EQ-Web/blob/main/web/wsgi.py) <br>
