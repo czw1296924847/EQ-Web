@@ -104,7 +104,7 @@ You can view the model training process in background system <br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_process.png)
 
 ### 5. Testing Model
-After training some model, go to `http://127.0.0.1:8000/estimate/magnitude_estimator/test` <br>
+<a name="section-test"></a> After training some model, go to `http://127.0.0.1:8000/estimate/magnitude_estimator/test` <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_before.png)<br>
 
@@ -158,7 +158,7 @@ Define your own model structure in [net.py](https://github.com/czw1296924847/EQ-
 Implement your model code in [network.py](https://github.com/czw1296924847/EQ-Web/blob/main/estimate/network.py) <br>
 EQ-Web provide a class by defining 4 functions: `pre_train`, `training`, `pre_test`, `testing`. Of course, you can choose better approaches. <br>
 
-- **pre_train**: Obtain parameters required before training. This is related to the format of input JSON to [Section train](#section-train) <br>
+- **pre_train**: Obtain parameters required before training. This is related to the format of input JSON to [4. Training Model](#section-train) <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/pre_train.png)<br>
 
@@ -168,7 +168,7 @@ EQ-Web provide a class by defining 4 functions: `pre_train`, `training`, `pre_te
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/training.png)<br>
 
 
-- **pre_test**: Obtain parameters required before testing <br>
+- **pre_test**: Obtain parameters required before testing. This is related to the format of input JSON to [5. Testing Model](#section-test) <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/pre_test.png)<br>
 
