@@ -39,28 +39,28 @@ python manager.py migrate
 We have defined three Django Models, including<br>
 - **EndPoint**:<br>
 API endpoints,       including `name`, `owner`, `created_at` <br>
-
+<!---
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/EndPoint.png)<br>
-
+-->
 
 - **MagModel**:<br>
 Model information,   including `name`, `description`, `code`, `version`, `owner`, `created_at`, `parent_endpoints` <br>
-
+<!---
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/MagModel.png)<br>
-
+-->
 
 - **MagStatus**:<br>
 Model status,       including `status`, `active`, `created_by`, `parent_model` <br>
-
+<!---
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/MagStatus.png)<br>
 
 
 - **MagRequest**:<br>
 Requests to model,   including `input_data`, `full_response`, `response`, `feedback`, `created_by`, `parent_model`
-
+<!---
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/MagRequest.png)<br>
 
-
+-->
 
 ### 2. Starting Service
 To start the web server, you should use
