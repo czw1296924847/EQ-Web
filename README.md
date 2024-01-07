@@ -17,6 +17,7 @@ conda install markdown
 conda install django-filter
 ```
 
+
 ## Dataset Preparation
 The Dataset used in our paper can be downloaded from [https://github.com/smousavi05/STEAD](https://github.com/smousavi05/STEAD).
 
@@ -37,6 +38,7 @@ We have defined three Django Models, including<br>
 - MagStatus
 - MagRequest
 
+
 ### 2. Starting Service
 `python manager.py runserver`<br>
 
@@ -48,7 +50,9 @@ For Linux system, you can access web pages by using <br>
 xdg-open http://{host}:{port}
 ```
 then you will see <br>
-![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/root_page.png)
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/root_page.png)<br>
+
 In our example, host = 127.0.0.1 and port = 8000.
 
 ### 4. Training Model
@@ -74,9 +78,13 @@ and provide example JSON input:
 }
 ```
 and click the $\text{\color{blue}{POST}}$ button, the model starts training <br>
+
 After a period of time (maybe a long time for model training), you should see <br>
+
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_after.png)<br>
+
 You can view the model training process in background system <br>
+
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/train_process.png)
 
 ### 5. Testing Model
@@ -102,9 +110,13 @@ and provide example JSON input:
 }
 ```
 and click the $\text{\color{blue}{POST}}$ button, the model starts testing <br>
+
 After a shorter period of time, you should see views like <br>
+
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_after.png)<br>
+
 You can view the model testing process in background system <br>
+
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_process.png)<br>
 
 
