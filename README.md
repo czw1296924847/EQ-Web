@@ -161,14 +161,20 @@ where the `CREIME` haven't been trained.
 ## Extension
 If you plan to make your own models and data, you can take the following steps <br>
 
-### 1. Defining Your Model Structure
+### E.1. Defining Your Model Structure
 Define your own model structure in [net.py](https://github.com/czw1296924847/EQ-Web/blob/main/func/net.py) <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/net.png)<br>
 
-### 2. Serving Your Model
+### E.2. Serving Your Model
 Implement your model code in [network.py](https://github.com/czw1296924847/EQ-Web/blob/main/estimate/network.py) <br>
 EQ-Web provide a class by defining: `pre_train`, `training`, `pre_test`, `testing`. Of course, you can choose better approaches. <br>
+
+#### Parameter Initialization
+Before modifying, please confirm all of used parameters. For example, if you don't want to know the directory of model and data, fix their values and retrieve them from `pre_train1 and `pre_test` <br>
+
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/pre_train.png)<br>
+
 
 - **pre_train**: Obtain parameters required before training. This is related to the format of input JSON to [4. Training Model](#section-train) <br>
 
@@ -190,7 +196,7 @@ EQ-Web provide a class by defining: `pre_train`, `training`, `pre_test`, `testin
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/testing.png)<br>
 
 
-### 3. Registrying Your Model
+### E.3. Registrying Your Model
 Do not forget to registry your model in [wsgi.py](https://github.com/czw1296924847/EQ-Web/blob/main/web/wsgi.py) <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/wsgi.png)<br>
