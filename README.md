@@ -5,7 +5,9 @@ But in reality, EQ-Web can be extended to any deep learning or machine learning 
 ## Installation
 EQ-Web is based on [Django](https://docs.djangoproject.com) and [Django REST framework](https://www.django-rest-framework.org/). You can obtain relevant tutorials from [Machine Learning with Django](https://www.deploymachinelearning.com/).<br>
 Firstly please create a virtual environment for yourself<br>
-`conda create -n your-env-name python=3.9`<br><br>
+```
+conda create -n your-env-name python=3.9
+```
 Then, there are some Python packages need to be installed<br>
 ```
 conda install pytorch torchvision torchaudio cudatoolkit=11.3
@@ -33,14 +35,18 @@ python manager.py migrate
 ```
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/generate_model.png)<br>
 We have defined three Django Models, including<br>
-- EndPoint
-- MagModel
+- EndPoint Our endpoints, including `name`, `owner`, `created_at`
+- MagModel Our Model
 - MagStatus
 - MagRequest
 
 
 ### 2. Starting Service
-`python manager.py runserver`<br>
+To start the web server, you should use
+```
+python manager.py runserver
+```
+then in backgroudn system, you can see <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/run_server.png)<br>
 
