@@ -170,8 +170,7 @@ Define your own model structure in [net.py](https://github.com/czw1296924847/EQ-
 Implement your model code in [network.py](https://github.com/czw1296924847/EQ-Web/blob/main/estimate/network.py) <br>
 EQ-Web provide a class by defining: `pre_train`, `training`, `pre_test`, `testing`. Of course, you can choose better approaches. <br>
 
-#### Parameter Initialization
-Before modifying, please confirm all of used parameters. For example, if you don't want to know the directory of model and data, fix their values and retrieve them from `pre_train` and `pre_test` <br>
+- **Wait**: Before modifying, please confirm all of used parameters. For example, if you don't want to know the directory of model and data, fix their values and retrieve them from `pre_train` and `pre_test` <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/init.png)<br>
 
