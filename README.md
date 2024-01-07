@@ -125,10 +125,6 @@ and provide example JSON input:
 {
     "network": "EQGraphNet",
     "device": "cuda:1",
-    "lr": 0.0005,
-    "decay": 0.0005,
-    "batch_size": 64,
-    "epochs": 100,
     "train_ratio": 0.75,
     "m": 100,
     "sm_scale": ["ml"],
