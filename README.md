@@ -156,7 +156,7 @@ Define your own model structure in [net.py](https://github.com/czw1296924847/EQ-
 
 ### 2. Serving Your Model
 Implement your model code in [network.py](https://github.com/czw1296924847/EQ-Web/blob/main/estimate/network.py) <br>
-EQ-Web provide a class by defining 4 functions: `pre_train`, `training`, `pre_test`, `testing`. Of course, you can choose better approaches. <br>
+EQ-Web provide a class by defining: `pre_train`, `training`, `pre_test`, `testing`. Of course, you can choose better approaches. <br>
 
 - **pre_train**: Obtain parameters required before training. This is related to the format of input JSON to [4. Training Model](#section-train) <br>
 
