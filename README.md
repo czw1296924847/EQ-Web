@@ -181,7 +181,6 @@ Re-execute the command to generate Django database, then restart the server
 python manager migrate
 python manager runserver
 ```
-<br>
 
 
 ### 1. Testing model without Training
