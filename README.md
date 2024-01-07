@@ -171,6 +171,18 @@ rm -rf web
 ```
 Upload files to background system, and start over from the first step in [Program Description](#section-begin)
 
+- **Not so violent**:<br
+Remove the db.sqlite3 file. For Linux system, you can
+```
+rm db.sqlite3
+```
+Re-execute the command to generate Django database, then restart the server
+```
+python manager migrate
+python manager runserver
+```
+
+
 ### 1. Testing model without Training
 If you have not trained the model before testing, you will <br>
 
