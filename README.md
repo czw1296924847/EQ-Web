@@ -163,7 +163,7 @@ re_ad:        the directory of saved model, default "/home/chenziwei2021/pyn/pap
 ### 0. Universal method
 There are two **violent** methods that can solve most bugs. So you should use them with caution.
 
-#### 0.1 Extremely Violent
+- **Extremely Violent**:<br>
 Remove the web project. For Linux system, firstly make sure you have backed up all files (excluding temporary files), then
 ```
 cd ..
