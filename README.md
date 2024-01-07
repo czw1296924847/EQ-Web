@@ -98,3 +98,12 @@ You can view the model testing process in the background <br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/test_process.png)<br>
 
 ## Problems and Solutions
+
+## Extension
+If you plan to make your own models and data, you can take the following steps <br>
+
+### ?. Defining Model Structure
+Define your own model structure in [net.py](https://github.com/czw1296924847/EQ-Web/blob/main/func/net.py) <br>
+
+### ?. Registrying Your Model
+Do not forget to registry your model in [wsgi.py](https://github.com/czw1296924847/EQ-Web/blob/main/web/wsgi.py) <br>
