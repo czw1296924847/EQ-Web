@@ -143,6 +143,7 @@ If you have not trained the model before testing, you will <br>
 
 where the `CREIME` haven't been trained.
 
+
 ## Extension
 If you plan to make your own models and data, you can take the following steps <br>
 
@@ -156,27 +157,31 @@ Implement your model code in [network.py](https://github.com/czw1296924847/EQ-We
 
 EQ-Web provide a class by defining 4 functions: `pre_train`, `training`, `pre_test`, `testing` , ``. Of course, you can choose better approaches <br>
 
-- **pre_train**:<br>
-include  <br>
+- **pre_train**: Obtain parameters required before training <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/pre_train.png)<br>
 
-- **training**:<br>
-include  <br>
+
+- **training**: Training model, mainly including: loading data, iterative training, updating weights. <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/training.png)<br>
 
-- **pre_test**:<br>
-include  <br>
+
+- **pre_test**: Obtain parameters required before testing <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/pre_test.png)<br>
 
-- **testing**:<br>
-include <br>
+
+- **testing**: Testing model, mainly including: calculating metrics.<br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/testing.png)<br>
 
-### ?. Registrying Your Model
+
+### 3. Registrying Your Model
 Do not forget to registry your model in [wsgi.py](https://github.com/czw1296924847/EQ-Web/blob/main/web/wsgi.py) <br>
 
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/wsgi.png)<br>
+
+
+## API
+
