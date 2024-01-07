@@ -43,11 +43,12 @@ We have defined three Django Models, including<br>
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/run_server.png)<br>
 
 ### Accessing Web and Entering Root Page
-You can access web pages on a Linux system using<br>
-`xdg-open http://[host]:[port]`<br>
-In our example, host = 127.0.0.1 and port = 8000, then you can see <br>
-
-![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/root_page.png)<br>
+For Linux system, you can access web pages by using <br>
+'''
+xdg-open http://{host}:{port}
+'''
+![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/root_page.png)
+In our example, host = 127.0.0.1 and port = 8000.
 
 ### Training Model
 Go to `http://127.0.0.1:8000/estimate/magnitude_estimator/train` <br>
