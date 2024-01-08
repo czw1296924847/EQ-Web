@@ -275,13 +275,24 @@ Here we provide technical reference for APIs. They will describe the usage of th
 `true`: the true label <br>
 `pred`: the predicted result by models <br>
 
-- **get_edge_info**: get the edge-index and edge-weight used for GNN (torch_geometric) layers <br>
+- **get_edge_info**: get the edge-index and edge-weight used for GNN ([torch_geometric](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html)) layers <br>
 `k`: the number of ajancent nodes of 'ts_un' and 'tg' <br>
 `num_nodes`: the number of global graph structure <br>
 `adm_style`: the style of adjacency matrix, including 'ts_un' and 'tg' <br>
 `device`: the device of Pytorch model, including 'cpu', 'cuda:1' and 'cuda:2' <br>
 
-- **get_gnn**: get GNN layer (torch_geometric> <br>
+- **get_gnn**: get GNN layer ([torch_geometric](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html)) <br>
 `gnn_style`: the GNN style, including 'gcn', 'cheb', 'unimp' and so on <br>
 `in_dim`: the input dimension <br>
 `out_dim`: the output dimension <br>
+
+- **tran_adm_to_edge_index**: transport adjacency matrix to the edge-index <br>
+`adm`: the adjacency matrix <br>
+
+### estimate/views.py
+
+- **ModelTrainView**: View of web page for model training <br>
+`post`: when you click the $\text{\color{blue}{POST}}$ button, go to this function and start model training
+  
+- **ModelTestView**: View of web page for model testing <br>
+`post`: when you click the $\text{\color{blue}{POST}}$ button, go to this function and start model testing
