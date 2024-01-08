@@ -249,3 +249,28 @@ Here we provide technical reference for APIs. They will describe the usage of th
 - **get_train_or_test_idx**: Randomly generate indexes for training and testing sets<br>
 `num`: the sample number of training and testing sets<br>
 `num_train`: the sample number of training set<br>
+
+- **SelfData**: Custom dataset, used for model training in deep learning <br>
+`data`: input data, in our example is earthquake signals<br>
+`label`: input label, in our example is magnitude <br>
+`*args`: other input information which may be used during model training and testing <br>
+
+- **remain_sm_scale**: only retain earthquake samples of specific magnitude scales <br>
+`data`: earthquake signals <br>
+`df`: earthquake information <br>
+`label`: magnitude value <br>
+`scale`: magnitude scale <br>
+
+- **get_item_by_dim**: Determine the index based on dimension, where the index is used in `SelfData.__getitem__` <br>
+`data`: input data <br>
+`item`: dataset item, this is given by `SelfData.__getitem__` <br>
+
+### func/net.py
+
+- **cal_rmse_one_arr**: calculate the root mean square error <br>
+`true`: the true label <br>
+`pred`: the predicted result by models <br>
+
+- **cal_r2_one_arr**: calculate the coefficient of determination <br>
+`true`: the true label <br>
+`pred`: the predicted result by models <br>
