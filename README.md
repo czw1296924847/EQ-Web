@@ -74,7 +74,7 @@ then in backgroudn system, you can see <br>
 ### 3. Accessing Web and Entering Root Page
 For Linux system, you can access web pages by using <br>
 ```
-xdg-open http://{host}:{port}
+xdg-open http://{host}:{port}/estimate
 ```
 then you will see <br>
 
