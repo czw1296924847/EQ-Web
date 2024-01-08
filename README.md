@@ -65,7 +65,7 @@ Requests to model,   including `input_data`, `full_response`, `response`, `feedb
 ### 2. Starting Service
 To start the web server, you should use
 ```
-python manager.py runserver
+python manager.py runserver 0.0.0.0 8000
 ```
 then in backgroudn system, you can see <br>
 
@@ -237,9 +237,8 @@ Do not forget to registry your model in [wsgi.py](https://github.com/czw12969248
 ### E.r. Restarting Server
 Use `Ctrl C` to stop the running server, and then restart it <br>
 ```
-python manager.py runserver
+python manager.py runserver 0.0.0.0 8000
 ```
-
 
 ## API Reference
 Here we provide technical reference for APIs. They will describe the usage of them <br>
