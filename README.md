@@ -234,5 +234,18 @@ Do not forget to registry your model in [wsgi.py](https://github.com/czw12969248
 ![image](https://github.com/czw1296924847/EQ-Web/blob/main/image/wsgi.png)<br>
 
 
-## API
+### E.r. Restarting Server
+Use `Ctrl C` to stop the running server, and then restart it <br>
+```
+python manager.py runserver
+```
 
+
+## API Reference
+Here we provide technical reference for APIs. They will describe the usage of them <br>
+
+### func/process.py
+
+- **get_train_or_test_idx**: Randomly generate indexes for training and testing sets<br>
+`num`: the sample number of training and testing sets<br>
+`num_train`: the sample number of training set<br>
