@@ -305,6 +305,6 @@ Firstly, please download the nvm, and confirm the version of your Linux system a
 ```
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 getconf GNU_LIBC_VERSION
-nvm install v16.0.0
+npx nvm install v16.20.2
 ```
-In our example, the version of glibc is 2.27, so we download nodejs v16.0.0
+In our example, the version of glibc is 2.27, so we download v16.20.2, and please add `npx` if you are not root.
