@@ -1,5 +1,5 @@
 # EQ-Web
-EQ-Web is a web project used for seismology including magnitude estimation and so on. <br>
+EQ-Web is a web backend used for seismology including magnitude estimation and so on. <br>
 But in reality, EQ-Web can be extended to any deep learning or machine learning models. <br>
 
 
@@ -295,3 +295,13 @@ Here we provide technical reference for APIs. They will describe the usage of th
   
 - **ModelTestView**: View of web page for model testing <br>
 `post`: when you click the $\text{\color{blue}{POST}}$ button, go to this function and start model testing
+
+
+# Frontend
+If you want to build a frontend the beautiful page, here we propose a frontend package by using Vue framework <br>
+
+## Installation
+Firstly, confirm the version of your Linux system
+```
+getconf GNU_LIBC_VERSION
+```
