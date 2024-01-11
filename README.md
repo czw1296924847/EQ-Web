@@ -298,10 +298,13 @@ Here we provide technical reference for APIs. They will describe the usage of th
 
 
 # Frontend
-If you want to build a frontend the beautiful page, here we propose a frontend package by using Vue framework <br>
+If you want to build a frontend the beautiful page, here we propose a frontend package by using [Vue](https://vuejs.org/guide/introduction.html) framework <br>
 
 ## Installation
-Firstly, confirm the version of your Linux system
+Firstly, please download the nvm, and confirm the version of your Linux system and select right version of [nodejs](https://nodejs.org/en/download)
 ```
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 getconf GNU_LIBC_VERSION
+nvm install v16.0.0
 ```
+In our example, the version of glibc is 2.27, so we download nodejs v16.0.0
