@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from estimate.models import EndPoint, MagModel, MagStatus, MagRequest
+from .models import *
 
 
 class EndPointSerializer(serializers.ModelSerializer):
@@ -11,17 +11,16 @@ class EndPointSerializer(serializers.ModelSerializer):
 
 
 class MagModelSerializer(serializers.ModelSerializer):
-    current_status = serializers.SerializerMethodField(read_only=True)
-
-    def get_current_status(self, model):
-        return MagStatus.objects.filter(parent_model=model).latest('created_at').status
-
     class Meta:
         model = MagModel
-        read_only_fields = ("id", "name", "description", "code",
-                            "version", "owner", "created_at",
-                            "parent_endpoint", "current_status")
-        fields = read_only_fields
+        fields = ("pk", "name", "description", "code",
+                  "version", "owner", "created_at", "situation")
+        extra_kwargs = {
+            'code': {'required': False},
+            'version': {'required': False},
+            'created_at': {'required': False},
+            'situation': {'required': False},
+        }
 
 
 class MagStatusSerializer(serializers.ModelSerializer):
@@ -34,20 +33,24 @@ class MagStatusSerializer(serializers.ModelSerializer):
 class MagRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = MagRequest
-        read_only_fields = (
-            "id",
-            "input_data",
-            "full_response",
-            "response",
-            "created_at",
-            "parent_model",
-        )
-        fields = (
-            "id",
-            "input_data",
-            "full_response",
-            "response",
-            "feedback",
-            "created_at",
-            "parent_model",
-        )
+        read_only_fields = ("id", "input_data", "full_response", "response", "created_at", "parent_model",)
+        fields = ("id", "input_data", "full_response", "response", "feedback", "created_at", "parent_model",)
+
+
+class FeatureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeatureModel
+        fields = ("pk", "param", "description")
+
+
+class PointSerializer(serializers.Serializer):
+    x = serializers.FloatField()
+    y = serializers.FloatField()
+
+
+class ResultSerializer(serializers.Serializer):
+    points = PointSerializer(many=True)
+    r2 = serializers.FloatField()
+    rmse = serializers.FloatField()
+    e_mean = serializers.FloatField()
+    e_std = serializers.FloatField()

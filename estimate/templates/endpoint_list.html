@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EndPoint List</title>
+</head>
+<body>
+<h1>EndPoints</h1>
+<ul>
+    {% for endpoint in endpoints %}
+    <li>{{ endpoint.owner }}</li>
+    <a href="{% url 'estimate:test' endpoint.name %}">{{ endpoint.name }}</a>
+    {% endfor %}
+</ul>
+</body>
+</html>

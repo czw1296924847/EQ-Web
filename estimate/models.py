@@ -1,9 +1,12 @@
 from django.db import models
 
-class EndPoint(models.Model):
-    name = models.CharField(max_length=128)
-    owner = models.CharField(max_length=128)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+
+class User(models.Model):
+    username = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.username
 
 
 class MagModel(models.Model):
@@ -12,8 +15,19 @@ class MagModel(models.Model):
     code = models.CharField(max_length=50000)
     version = models.CharField(max_length=128)
     owner = models.CharField(max_length=128)
+    situation = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
-    parent_endpoint = models.ForeignKey(EndPoint, on_delete=models.CASCADE)
+
+
+class FeatureModel(models.Model):
+    param = models.CharField(max_length=128)
+    description = models.CharField(max_length=1000)
+
+
+class EndPoint(models.Model):
+    name = models.CharField(max_length=128)
+    owner = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
 
 class MagStatus(models.Model):
