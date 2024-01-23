@@ -296,12 +296,6 @@ Here we provide technical reference for APIs. They will describe the usage of th
 - **ModelTestView**: View of web page for model testing <br>
 `post`: when you click the $\text{\color{blue}{POST}}$ button, go to this function and start model testing
 
-
-# Frontend
-If you want to build a frontend the beautiful page, here we propose a frontend package by using [Vue](https://vuejs.org/guide/introduction.html) framework <br>
-
-## Installation
-Firstly, please download the nvm, and confirm the version of your Linux system and select right version of [nodejs](https://nodejs.org/en/download)
 ```
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 getconf GNU_LIBC_VERSION
