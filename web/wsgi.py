@@ -12,71 +12,81 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 import inspect
-from estimate.network import MagInfoNet, EQGraphNet, MagNet, CREIME, ConvNetQuakeINGV
+import estimate.network as network
+import func.net as net
 from estimate.registry import MagRegistry
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings')
 
 application = get_wsgi_application()
 
-
 """
-registry model
+registry user and model, for operation estimation
 """
 registry = MagRegistry()
 
-MaI = MagInfoNet()
-registry.add_model(endpoint_name="magnitude_estimator",
-                   model_object=MaI,
+registry.add_model(model_object=network.MagInfoNet(),
                    model_name="MagInfoNet",
-                   model_status="production",
+                   model_status="Production",
                    model_version="0.0.1",
-                   owner="Chen Ziwei",
+                   model_owner="Chen Ziwei",
+                   model_situation="Free",
                    model_description="Proposed model",
-                   model_code=inspect.getsource(MagInfoNet))
-print("registry.endpoints = {}".format(registry.endpoints))
+                   model_code=inspect.getsource(net.MagInfoNet))
 
-EQG = EQGraphNet()
-registry.add_model(endpoint_name="magnitude_estimator",
-                   model_object=EQG,
+registry.add_model(model_object=network.EQGraphNet(),
                    model_name="EQGraphNet",
-                   model_status="production",
+                   model_status="Production",
                    model_version="0.0.1",
-                   owner="Chen Ziwei",
+                   model_owner="Chen Ziwei",
+                   model_situation="Free",
                    model_description="Proposed model",
-                   model_code=inspect.getsource(EQGraphNet))
-print("registry.endpoints = {}".format(registry.endpoints))
+                   model_code=inspect.getsource(net.EQGraphNet))
 
-Mag = MagNet()
-registry.add_model(endpoint_name="magnitude_estimator",
-                   model_object=Mag,
+registry.add_model(model_object=network.MagNet(),
                    model_name="MagNet",
-                   model_status="production",
+                   model_status="Production",
                    model_version="0.0.1",
-                   owner="Mousavi",
+                   model_owner="Mousavi",
+                   model_situation="Free",
                    model_description="From doi.org/10.1029/2019GL085976",
-                   model_code=inspect.getsource(MagNet))
-print("registry.endpoints = {}".format(registry.endpoints))
+                   model_code=inspect.getsource(net.MagNet))
 
-CRE = CREIME()
-registry.add_model(endpoint_name="magnitude_estimator",
-                   model_object=CRE,
+registry.add_model(model_object=network.CREIME(),
                    model_name="CREIME",
-                   model_status="production",
+                   model_status="Production",
                    model_version="0.0.1",
-                   owner="Chakraborty",
+                   model_owner="Chakraborty",
+                   model_situation="Free",
                    model_description="From doi.org/10.1029/2022JB024595",
-                   model_code=inspect.getsource(CREIME))
-print("registry.endpoints = {}".format(registry.endpoints))
+                   model_code=inspect.getsource(net.CREIME))
 
-COI = ConvNetQuakeINGV()
-registry.add_model(endpoint_name="magnitude_estimator",
-                   model_object=COI,
-                   model_name="ConvNetQuakeINGV",
-                   model_status="production",
+registry.add_model(model_object=network.ConvNetQuakeINGV(),
+                   model_name="ConvNetQuake_INGV",
+                   model_status="Production",
                    model_version="0.0.1",
-                   owner="Lomax",
-                   model_description="From pubs.geoscienceworld.org/ssa/srl/article-abstract/90/2A/517/568771",
-                   model_code=inspect.getsource(ConvNetQuakeINGV))
-print("registry.endpoints = {}".format(registry.endpoints))
+                   model_owner="Lomax",
+                   model_situation="Free",
+                   model_description="From article-abstract/90/2A/517/568771",
+                   model_code=inspect.getsource(net.ConvNetQuakeINGV))
 
+
+registry.add_user(username="czw",
+                  password="fff")
+
+
+registry.add_feature(param="source_magnitude",
+                     description="Released seismic energy of earthquake")
+
+registry.add_feature(param="source_depth_km",
+                     description="Distance from ground to earthquake source")
+
+registry.add_feature(param="source_distance_km",
+                     description="Distance from observation to earthquake source")
+
+registry.add_feature(param="snr_db",
+                     description="Signal-to-noise ratio")
+
+registry.init_info()
+
+print()
