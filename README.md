@@ -1,4 +1,4 @@
-# EQ-Web-Frontend
+# EQ-Web-BackEnd
 EQ-Web-Frontend is a web backend used for seismology including magnitude estimation and so on. <br>
 But in reality, EQ-Web can be extended to any deep learning or machine learning models. <br>
 
