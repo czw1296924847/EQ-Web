@@ -15,6 +15,15 @@ def cal_r2_one_arr(true, pred):
     return r2
 
 
+def cal_metrics(true, pred):
+    error = true - pred
+    rmse = cal_rmse_one_arr(true, pred)
+    r2 = cal_r2_one_arr(true, pred)
+    e_mean = np.mean(error)
+    e_std = np.std(error)
+    return r2, rmse, e_mean, e_std
+
+
 class MagNet(nn.Module):
     def __init__(self):
         super(MagNet, self).__init__()
@@ -39,6 +48,7 @@ class MagNet(nn.Module):
         return h.view(-1)
 
 
+# from https://doi.org/10.1029/2022JB024595
 class CREIME(nn.Module):
     def __init__(self):
         super(CREIME, self).__init__()
@@ -259,34 +269,6 @@ class MagInfoNet(nn.Module):
         put = run_gnn(self.gnn_style, self.gnn2, put, self.ei2, self.ew2)
         put = self.last(put.view(put.shape[0], -1))
         return put.view(-1)
-
-
-# from https://doi.org/10.1029/2022JB024595
-class CREIME(nn.Module):
-    def __init__(self):
-        super(CREIME, self).__init__()
-        self.cnn1 = nn.Conv1d(3, 32, kernel_size=15, stride=1, padding=7)
-        self.cnn2 = nn.Conv1d(32, 16, kernel_size=15, stride=1, padding=7)
-        self.cnn3 = nn.Conv1d(16, 8, kernel_size=15, stride=1, padding=7)
-        self.pool = nn.MaxPool1d(kernel_size=4)
-        self.lstm1 = nn.LSTM(8, 128, batch_first=True)
-        self.lstm2 = nn.LSTM(128, 256, batch_first=True)
-        self.linear = nn.Linear(2048, 512)
-
-    def forward(self, x):
-        h = self.cnn1(x)
-        h = self.pool(h)
-        h = self.cnn2(h)
-        h = self.pool(h)
-        h = self.cnn3(h)
-        h = self.pool(h)
-
-        out, (_, _) = self.lstm1(h)
-        out, (_, _) = self.lstm2(out)
-
-        put = out.reshape(out.shape[0], -1)
-        put = self.linear(put)
-        return put
 
 
 def get_edge_info(k, num_nodes, adm_style, device):

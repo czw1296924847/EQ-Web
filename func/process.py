@@ -1,7 +1,14 @@
+import pandas as pd
 import torch
 import numpy as np
+import os
+import os.path as osp
 from torch.utils.data import Dataset
 from sklearn.preprocessing import StandardScaler
+
+
+ROOT = "/home/chenziwei2021/standford_dataset"
+RE_AD = "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
 
 
 def get_train_or_test_idx(num, num_train):
@@ -111,3 +118,62 @@ def prep_pt(prep_style, train, test=None):
         test = test.reshape(-1, 1)
     test_prep = model.transform(test)
     return model, train_prep, test_prep
+
+
+def save_result(style, re_ad, true, pred, loss, sm_scale, name, m_train, m_test, model=None):
+    if not osp.exists(re_ad):
+        os.makedirs(re_ad)
+    print(re_ad)
+    np.save(osp.join(re_ad, "{}_true_{}_{}_{}_{}.npy".format(style, sm_scale, name, m_train, m_test)), true)
+    np.save(osp.join(re_ad, "{}_pred_{}_{}_{}_{}.npy".format(style, sm_scale, name, m_train, m_test)), pred)
+    np.save(osp.join(re_ad, "{}_loss_{}_{}_{}_{}.npy".format(style, sm_scale, name, m_train, m_test)), np.array(loss))
+    if model is not None:
+        torch.save(model.state_dict(),
+                   osp.join(re_ad, "model_{}_{}_{}_{}.pkl".format(sm_scale, name, m_train, m_test)))
+    return True
+
+
+def get_dist(feature, bins, chunk_name, data_size, v_min=None, v_max=None):
+    re_ad = osp.join(RE_AD, "..", "data")
+    if not osp.exists(re_ad):
+        os.makedirs(re_ad)
+
+    x_ad = osp.join(re_ad, "dist_{}_x.npy".format(feature))
+    y_ad = osp.join(re_ad, "dist_{}_y.npy".format(feature))
+    if osp.exists(x_ad) and osp.exists(y_ad):
+        x, y = np.load(x_ad), np.load(y_ad)
+        return x, y
+
+    df = pd.read_csv(osp.join(ROOT, chunk_name, chunk_name + ".csv"))
+    data = df.loc[:, feature].values.reshape(-1)[:data_size - 1]
+    if feature == "source_depth_km":
+        data = data[data != "None"].astype(float)
+
+    if v_min is not None:
+        data = data[data >= v_min]
+        data = np.append(data, v_min)
+    if v_max is not None:
+        data = data[data <= v_max]
+        data = np.append(data, v_max)
+    label, _ = pd.cut(data, bins=bins, retbins=True)
+    label_vc = pd.DataFrame(label).value_counts()
+    interval, y = label_vc.index.tolist(), label_vc.values
+    x, left, right = [], float('inf'), -float('inf')
+    for i in range(bins):
+        interval_one = interval[i][0]
+        left_one, right_one = interval_one.left, interval_one.right
+        x.append((left_one + right_one) / 2)
+        if left_one < left:
+            left = left_one
+        if right_one > right:
+            right = right_one
+    x = np.array(x)
+    sort_index = np.argsort(x)
+    x, y = x[sort_index], y[sort_index]
+    if v_min is not None:
+        y[0] = y[0] - 1
+    if v_max is not None:
+        y[-1] = y[-1] - 1
+
+    np.save(x_ad, x), np.save(y_ad, y)
+    return x, y
