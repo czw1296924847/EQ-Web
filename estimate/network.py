@@ -1,5 +1,3 @@
-import os
-
 import pandas as pd
 import torch
 import os.path as osp
@@ -7,6 +5,8 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.nn import Parameter
+from .models import MagModel, ModelStatus
+from django.db import transaction
 import func.net as net
 import func.process as pro
 
@@ -17,7 +17,6 @@ class Net:
         self.decay = 0.0005
         self.batch_size = 64
         self.epochs = 100
-
         self.root = pro.ROOT
         self.re_ad = pro.RE_AD
         self.device = "cpu"
@@ -32,6 +31,9 @@ class Net:
         self.model = None
 
     def pre_train(self, input_data, model_name):
+        """
+        read params before model training
+        """
         input_data = pd.DataFrame(input_data, index=[0])
         self.lr = float(input_data["lr"].values[0])
         self.batch_size = int(input_data["batch_size"].values[0])
@@ -59,10 +61,14 @@ class Net:
         return None
 
     def pre_test(self, input_data, model_name):
+        """
+        read params before model testing
+        """
         input_data = pd.DataFrame(input_data, index=[0])
         self.sm_scale = input_data["sm_scale"].values[0]
         self.chunk_name = input_data["chunk_name"].values[0]
-        self.device = input_data["device"].values[0]
+        # self.device = input_data["device"].values[0]
+        self.device = "cpu"
 
         train_ratio = float(input_data["train_ratio"].values[0])
         self.data_size = int(input_data["data_size"].values[0])
@@ -86,8 +92,10 @@ class Net:
         return None
 
 
-# generate dataset for model testing
 def load_data(root, chunk_name, data_size, idx, device, sm_scale):
+    """
+    generate dataset for model training or testing
+    """
     data = torch.load(osp.join(root, str(data_size), "data.pt"))
     index = torch.load(osp.join(root, str(data_size), "index.pt"))
     df = pd.read_csv(osp.join(root, chunk_name + ".csv"))
@@ -99,8 +107,10 @@ def load_data(root, chunk_name, data_size, idx, device, sm_scale):
     return pro.remain_sm_scale(data, df, sm, sm_scale)
 
 
-# calculate result for response
 def get_metrics(true, pred, model_name, sm_scale, data_size):
+    """
+    calculate result for response
+    """
     r2, rmse, e_mean, e_std = net.cal_metrics(true, pred)
     num_show, num_round = 15, 2
     result = {
@@ -119,6 +129,9 @@ def get_metrics(true, pred, model_name, sm_scale, data_size):
 
 
 def ei_ew_device(model_name, model, device):
+    """
+    Place the weights of GNN on given device (cpu or gpu)
+    """
     if model_name == "MagInfoNet":
         model.ei1, model.ew1 = model.ei1.to(device), Parameter(model.ew1.float().to(device))
         model.ei2, model.ew2 = model.ei2.to(device), Parameter(model.ew2.float().to(device))
@@ -138,12 +151,35 @@ def ei_ew_device(model_name, model, device):
     return model
 
 
+def init_model_process(model_name):
+    """
+    initialize the metrics before model training
+    """
+    model = ModelStatus.objects.get(name=model_name)
+    model.process = ""
+    model.save()
+    return None
+
+
+def update_model_process(model_name, epoch, rmse, r2):
+    """
+    update the metrics during model training process
+    """
+    model = ModelStatus.objects.get(name=model_name)
+    model.process = "epoch:{},rmse:{:.4f},r2:{:.4f}".format(epoch, rmse, r2)
+    model.save()
+    return None
+
+
 class MagInfoNet(Net):
     def __init__(self):
         super().__init__()
         self.model = net.MagInfoNet("unimp", "ts_un", 1, "cpu")
 
     def get_pt(self, df):
+        """
+        get P and S wave arrival time
+        """
         ps_at_name = ["p_arrival_sample", "s_arrival_sample"]
         _, ps_at = pro.prep_pt("sta", df.loc[:, ps_at_name].values)
         ps_at = torch.from_numpy(ps_at).float()
@@ -154,6 +190,7 @@ class MagInfoNet(Net):
         return ps_at, p_t
 
     def training(self, input_data, model_name):
+        init_model_process(model_name)
         self.pre_train(input_data, model_name)
         self.model = ei_ew_device(self.model_name, self.model, self.device)
         data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
@@ -190,6 +227,7 @@ class MagInfoNet(Net):
             rmse = net.cal_rmse_one_arr(true, pred)
             r2 = net.cal_r2_one_arr(true, pred)
             loss_curve.append((rmse ** 2))
+            update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
         pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
@@ -238,6 +276,7 @@ class EQGraphNet(Net):
         self.model = net.EQGraphNet("gcn", "ts_un", 1, "cpu")
 
     def training(self, input_data, model_name):
+        init_model_process(model_name)
         self.pre_train(input_data, model_name)
         self.model = ei_ew_device(self.model_name, self.model, self.device)
         data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
@@ -272,6 +311,7 @@ class EQGraphNet(Net):
             rmse = net.cal_rmse_one_arr(true, pred)
             r2 = net.cal_r2_one_arr(true, pred)
             loss_curve.append((rmse ** 2))
+            update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
         pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
@@ -318,6 +358,7 @@ class MagNet(Net):
         self.model = net.MagNet()
 
     def training(self, input_data, model_name):
+        init_model_process(model_name)
         self.pre_train(input_data, model_name)
         data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
                                                    self.device, self.sm_scale)
@@ -351,6 +392,7 @@ class MagNet(Net):
             rmse = net.cal_rmse_one_arr(true, pred)
             r2 = net.cal_r2_one_arr(true, pred)
             loss_curve.append((rmse ** 2))
+            update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
         pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
@@ -422,6 +464,7 @@ class CREIME(Net):
         return x, y
 
     def training(self, input_data, model_name):
+        init_model_process(model_name)
         self.pre_train(input_data, model_name)
         data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
                                                    self.device, self.sm_scale)
@@ -456,6 +499,7 @@ class CREIME(Net):
             rmse = net.cal_rmse_one_arr(true, pred)
             r2 = net.cal_r2_one_arr(true, pred)
             loss_curve.append((rmse ** 2))
+            update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
         pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
@@ -503,6 +547,7 @@ class ConvNetQuakeINGV(Net):
         self.model = net.ConvNetQuakeINGV()
 
     def training(self, input_data, model_name):
+        init_model_process(model_name)
         self.pre_train(input_data, model_name)
         data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
                                                    self.device, self.sm_scale)
@@ -536,6 +581,7 @@ class ConvNetQuakeINGV(Net):
             rmse = net.cal_rmse_one_arr(true, pred)
             r2 = net.cal_r2_one_arr(true, pred)
             loss_curve.append((rmse ** 2))
+            update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
         pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,

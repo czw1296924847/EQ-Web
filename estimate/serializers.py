@@ -20,6 +20,7 @@ class MagModelSerializer(serializers.ModelSerializer):
             'version': {'required': False},
             'created_at': {'required': False},
             'situation': {'required': False},
+            'process': {'required': False},
         }
 
 
@@ -39,7 +40,7 @@ class MagRequestSerializer(serializers.ModelSerializer):
 
 class FeatureSerializer(serializers.ModelSerializer):
     class Meta:
-        model = FeatureModel
+        model = Feature
         fields = ("pk", "param", "description")
 
 

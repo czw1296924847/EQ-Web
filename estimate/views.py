@@ -72,6 +72,7 @@ class ModelTrainOneView(views.APIView):
         """
         from web.wsgi import registry
         model = MagModel.objects.filter(name=model_name)[0]
+
         if model.situation == "testing":
             return Response({"error": "Is testing"}, status=status.HTTP_409_CONFLICT)
         model.situation = "training"
@@ -156,7 +157,7 @@ class FeatureListView(views.APIView):
         :param request:
         :return:
         """
-        features = FeatureModel.objects.all()
+        features = Feature.objects.all()
         serializer = FeatureSerializer(features, many=True, context={'request': request})
         return Response(serializer.data)
 
@@ -175,12 +176,15 @@ class FeatureDistView(views.APIView):
         chunk_name = request.GET.get('chunk_name')
         data_size = int(request.GET.get('data_size'))
 
-        if feature == "source_distance_km":
+        if feature == "source_depth_km":
+            v_min, v_max = 0, 150
+        elif feature == "source_magnitude":
             v_min = 0
 
         x, y = get_dist(feature, bins, chunk_name, data_size, v_min, v_max)
 
-        if feature in ["source_distance_km", "source_depth_km"]:
+        if feature in ["source_distance_km", "source_depth_km", "snr_db",
+                       "p_arrival_sample", "s_arrival_sample"]:
             x = np.round(x)
         elif feature == "source_magnitude":
             x = np.round(x, 2)
@@ -231,15 +235,30 @@ class ModelDetailView(views.APIView):
         """
         model = MagModel.objects.filter(name=model_name)
         serializer = MagModelSerializer(model, many=True, context={'request': request})
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def get_result(request):
+class ModelProcessView(views.APIView):
+    def get(self, request, model_name):
+        """
+        get the situation during train/test process
+        """
+        process = ModelStatus.objects.values_list('process', flat=True).get(name=model_name)
+        return Response(process, status=status.HTTP_200_OK)
+
+    def put(self, request, model_name):
+        """
+        initialize the model process, to be ""
+        """
+        model = ModelStatus.objects.get(name=model_name)
+        model.process = ""
+        model.save()
+        return Response(status=status.HTTP_200_OK)
+
+
+def get_params(request):
     """
     Read params, from OptResult.js
-
-    :param input_data:
-    :return:
     """
     train_ratio = float(request.GET.get('train_ratio'))
     data_size = int(request.GET.get('data_size'))
@@ -248,6 +267,21 @@ def get_result(request):
     data_size_train = int(data_size * train_ratio)
     data_size_test = data_size - data_size_train
     return sm_scale, chunk_name, data_size, data_size_train, data_size_test
+
+
+def get_result_ad(re_ad, opt, sm_scale, chunk_name, data_size_train, data_size_test):
+    """
+    get result file address
+    """
+    true_ad = osp.join(re_ad, "{}_true_{}_{}_{}_{}.npy".
+                       format(opt, sm_scale, chunk_name, str(data_size_train), str(data_size_test)))
+    pred_ad = osp.join(re_ad, "{}_pred_{}_{}_{}_{}.npy".
+                       format(opt, sm_scale, chunk_name, str(data_size_train), str(data_size_test)))
+    loss_ad = osp.join(re_ad, "{}_loss_{}_{}_{}_{}.npy".
+                       format(opt, sm_scale, chunk_name, str(data_size_train), str(data_size_test)))
+    model_ad = osp.join(re_ad, "model_{}_{}_{}_{}.pkl".
+                        format(sm_scale, chunk_name, str(data_size_train), str(data_size_test)))
+    return true_ad, pred_ad, loss_ad, model_ad
 
 
 class CompTruePredView(views.APIView):
@@ -260,15 +294,13 @@ class CompTruePredView(views.APIView):
         :param opt: 'train' or 'test'
         :return: True magnitudes or Predicted operation
         """
-        sm_scale, chunk_name, data_size, data_size_train, data_size_test = get_result(request)
+        sm_scale, chunk_name, data_size, data_size_train, data_size_test = get_params(request)
         re_ad = osp.join(RE_AD, model_name, str(data_size))
 
         # set a smaller number for web show, to avoid web crash
         num_show = 500
-        true = np.load(osp.join(re_ad, "{}_true_{}_{}_{}_{}.npy".
-                                format(opt, sm_scale, chunk_name, str(data_size_train), str(data_size_test))))
-        pred = np.load(osp.join(re_ad, "{}_pred_{}_{}_{}_{}.npy".
-                                format(opt, sm_scale, chunk_name, str(data_size_train), str(data_size_test))))
+        true_ad, pred_ad, _, _ = get_result_ad(re_ad, opt, sm_scale, chunk_name, data_size_train, data_size_test)
+        true, pred = np.load(true_ad), np.load(pred_ad)
         points = [{"x": i, "y": j} for i, j in zip(true[:num_show], pred[:num_show])]
         r2, rmse, e_mean, e_std = cal_metrics(true, pred)
         data = {
@@ -292,7 +324,7 @@ class LossCurveView(views.APIView):
         :param opt: 'train' or 'test'
         :return:
         """
-        sm_scale, chunk_name, data_size, data_size_train, data_size_test = get_result(request)
+        sm_scale, chunk_name, data_size, data_size_train, data_size_test = get_params(request)
         re_ad = osp.join(RE_AD, model_name, str(data_size))
         loss = np.load(osp.join(re_ad, "{}_loss_{}_{}_{}_{}.npy".
                                 format(opt, sm_scale, chunk_name, str(data_size_train), str(data_size_test))))
@@ -302,6 +334,21 @@ class LossCurveView(views.APIView):
 
 
 class ModelRecordView(views.APIView):
+    def get(self, request, model_name, opt, *args, **kwargs):
+        sm_scale, chunk_name, data_size, data_size_train, data_size_test = get_params(request)
+        re_ad = osp.join(RE_AD, model_name, str(data_size))
+        true_ad, pred_ad, loss_ad, model_ad = get_result_ad(re_ad, opt, sm_scale, chunk_name, data_size_train,
+                                                            data_size_test)
+        if opt == "train":
+            return Response(
+                osp.exists(true_ad) and osp.exists(pred_ad) and osp.exists(loss_ad) and osp.exists(model_ad),
+                status=status.HTTP_200_OK)
+        elif opt == "test":
+            return Response(osp.exists(true_ad) and osp.exists(pred_ad) and osp.exists(loss_ad),
+                            status=status.HTTP_200_OK)
+        else:
+            return Response(False, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, model_name, opt, *args, **kwargs):
         """
         Delete the train/test result (model.pkl, loss.npy, true.npy, pred.npy)
@@ -311,22 +358,13 @@ class ModelRecordView(views.APIView):
         :param opt:
         :return:
         """
-        train_ratio = float(request.GET.get('train_ratio'))
-        data_size = int(request.GET.get('data_size'))
-        data_size_train = int(data_size * train_ratio)
-        data_size_test = data_size - data_size_train
-        sm_scale = request.GET.get('sm_scale')
-        chunk_name = request.GET.get('chunk_name')
+        sm_scale, chunk_name, data_size, data_size_train, data_size_test = get_params(request)
         re_ad = osp.join(RE_AD, model_name, str(data_size))
-        os.remove(osp.join(re_ad, "{}_true_{}_{}_{}_{}.npy".
-                           format(opt, sm_scale, chunk_name, str(data_size_train), str(data_size_test))))
-        os.remove(osp.join(re_ad, "{}_pred_{}_{}_{}_{}.npy".
-                           format(opt, sm_scale, chunk_name, str(data_size_train), str(data_size_test))))
-        os.remove(osp.join(re_ad, "{}_loss_{}_{}_{}_{}.npy".
-                           format(opt, sm_scale, chunk_name, str(data_size_train), str(data_size_test))))
+        true_ad, pred_ad, loss_ad, model_ad = get_result_ad(re_ad, opt, sm_scale, chunk_name,
+                                                            data_size_train, data_size_test)
+        os.remove(true_ad), os.remove(pred_ad), os.remove(loss_ad)
         if opt == "train":
-            os.remove(osp.join(re_ad, "model_{}_{}_{}_{}.pkl".
-                               format(sm_scale, chunk_name, str(data_size_train), str(data_size_test))))
+            os.remove(model_ad)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -454,3 +492,13 @@ class ModelViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
 class MagModelViewSet(ModelViewSet):
     serializer_class = MagModelSerializer
     queryset = MagModel.objects.all()
+
+
+def index(request):
+    return render(request, 'index.html', {})
+
+
+def room(request, room_name):
+    return render(request, 'room.html', {
+        'room_name': room_name
+    })

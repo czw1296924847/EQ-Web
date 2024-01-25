@@ -80,7 +80,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'web.wsgi.application'
-# ASGI_APPLICATION = "web.asgi.application"
+ASGI_APPLICATION = "web.asgi.application"
 
 
 # Database
@@ -181,3 +181,9 @@ CORS_ALLOW_HEADERS = (
     'x-token',
     'X-Token',
 )
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

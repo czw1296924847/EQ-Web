@@ -62,7 +62,7 @@ registry.add_model(model_object=network.CREIME(),
                    model_code=inspect.getsource(net.CREIME))
 
 registry.add_model(model_object=network.ConvNetQuakeINGV(),
-                   model_name="ConvNetQuake_INGV",
+                   model_name="ConvNetQuakeINGV",
                    model_status="Production",
                    model_version="0.0.1",
                    model_owner="Lomax",
@@ -86,6 +86,12 @@ registry.add_feature(param="source_distance_km",
 
 registry.add_feature(param="snr_db",
                      description="Signal-to-noise ratio")
+
+registry.add_feature(param="p_arrival_sample",
+                     description="P wave arrival time")
+
+registry.add_feature(param="s_arrival_sample",
+                     description="S wave arrival time")
 
 registry.init_info()
 

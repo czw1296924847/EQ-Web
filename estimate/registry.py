@@ -5,6 +5,7 @@ class MagRegistry:
     """
     Initialize Magnitude Estimation Model, when starting service
     """
+
     def __init__(self):
         self.models = {}
         self.users = {}
@@ -22,11 +23,14 @@ class MagRegistry:
                 situation=model_situation,
             )
             if model_created:
-                status = MagStatus(status=model_status,
-                                   created_by=model_owner,
-                                   parent_model=database_object,
-                                   active=True)
-                status.save()
+                model_status = ModelStatus(name=model_name, process="")
+                model_status.save()
+
+                mag_status = MagStatus(status=model_status,
+                                       created_by=model_owner,
+                                       parent_model=database_object,
+                                       active=True)
+                mag_status.save()
                 database_object.save()
 
         else:
@@ -47,8 +51,8 @@ class MagRegistry:
         return None
 
     def add_feature(self, param, description):
-        if not FeatureModel.objects.filter(param=param, description=description).exists():
-            FeatureModel.objects.create(param=param, description=description)
+        if not Feature.objects.filter(param=param, description=description).exists():
+            Feature.objects.create(param=param, description=description)
         return None
 
     def init_info(self):
@@ -57,4 +61,5 @@ class MagRegistry:
         :return:
         """
         MagModel.objects.all().update(situation="Free")
+        # ModelStatus.objects.all().update(process="")
         return None

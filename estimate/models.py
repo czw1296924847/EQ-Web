@@ -19,7 +19,12 @@ class MagModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
 
-class FeatureModel(models.Model):
+class ModelStatus(models.Model):
+    name = models.CharField(max_length=128)
+    process = models.CharField(max_length=50000)
+
+
+class Feature(models.Model):
     param = models.CharField(max_length=128)
     description = models.CharField(max_length=1000)
 

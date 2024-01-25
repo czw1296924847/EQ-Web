@@ -3,7 +3,6 @@ from rest_framework.routers import DefaultRouter
 
 from .views import *
 
-
 app_name = "estimate"
 
 urlpatterns = [
@@ -16,10 +15,14 @@ urlpatterns = [
     re_path(r'^magnitude/(?P<model_name>.+)/train$', ModelTrainOneView.as_view()),
     re_path(r'^magnitude/(?P<model_name>.+)/test$', ModelTestOneView.as_view()),
     re_path(r'^magnitude/(?P<model_name>.+)/detail$', ModelDetailView.as_view()),
+    re_path(r'^magnitude/(?P<model_name>.+)/process', ModelProcessView.as_view()),
     re_path(r'^magnitude/(?P<model_name>.+)/(?P<opt>.+)/true_pred$', CompTruePredView.as_view()),
     re_path(r'^magnitude/(?P<model_name>.+)/(?P<opt>.+)/loss$', LossCurveView.as_view()),
     re_path(r'^magnitude/(?P<model_name>.+)/(?P<opt>.+)/record$', ModelRecordView.as_view()),
     re_path(r'^magnitude/login$', LoginView.as_view()),
+
+    path('', index, name='index'),
+    path('<str:room_name>/', room, name='room'),
 ]
 
 # router = DefaultRouter(trailing_slash=False)

@@ -133,19 +133,35 @@ def save_result(style, re_ad, true, pred, loss, sm_scale, name, m_train, m_test,
     return True
 
 
+def read_snr(df, style):
+    snr = df.snr_db.values
+    num = snr.shape[0]
+    snr_all = []
+    for i in range(num):
+        snr_one = snr[i][1:-1]
+        snr_one_ = snr_one.split(' ')
+        num_full = snr_one_.count('')
+        idx = 0
+        while idx < num_full:
+            snr_one_.remove('')
+            idx = idx + 1
+        snr_one_ = np.array([float(snr_one_[0]), float(snr_one_[1]), float(snr_one_[2])])
+        if style == "mean":
+            snr_one_mean = np.mean(snr_one_)
+            snr_all.append(snr_one_mean)
+        else:
+            raise TypeError("Unknown type of style")
+    snr_all = np.array(snr_all)
+    return snr_all
+
+
 def get_dist(feature, bins, chunk_name, data_size, v_min=None, v_max=None):
-    re_ad = osp.join(RE_AD, "..", "data")
-    if not osp.exists(re_ad):
-        os.makedirs(re_ad)
-
-    x_ad = osp.join(re_ad, "dist_{}_x.npy".format(feature))
-    y_ad = osp.join(re_ad, "dist_{}_y.npy".format(feature))
-    if osp.exists(x_ad) and osp.exists(y_ad):
-        x, y = np.load(x_ad), np.load(y_ad)
-        return x, y
-
     df = pd.read_csv(osp.join(ROOT, chunk_name, chunk_name + ".csv"))
-    data = df.loc[:, feature].values.reshape(-1)[:data_size - 1]
+    if feature == "snr_db":
+        data = read_snr(df, style="mean")
+    else:
+        data = df.loc[:, feature].values.reshape(-1)[:data_size - 1]
+
     if feature == "source_depth_km":
         data = data[data != "None"].astype(float)
 
@@ -174,6 +190,4 @@ def get_dist(feature, bins, chunk_name, data_size, v_min=None, v_max=None):
         y[0] = y[0] - 1
     if v_max is not None:
         y[-1] = y[-1] - 1
-
-    np.save(x_ad, x), np.save(y_ad, y)
     return x, y
