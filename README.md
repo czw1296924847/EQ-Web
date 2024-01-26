@@ -2,7 +2,7 @@
 **EQ-Web-BackEnd** is a web backend used for seismology including magnitude estimation and so on. <br>
 But in reality, **EQ-Web-BackEnd**  can be extended to any deep learning or machine learning models. <br>
 
-It can also serve as the backend framework for [EQ-Web-FrontEnd](https://github.com/zw-Ch/EQ-Web-FrontEnd)<br>
+It can also serve as the backend framework for [EQ-Web-FrontEnd](https://github.com/zw-Ch/EQ-Web-FrontEnd). <br>
 
 ## Installation
 **EQ-Web-BackEnd**  is based on [Django](https://docs.djangoproject.com) and [Django REST framework](https://www.django-rest-framework.org/). You can obtain relevant tutorials from [Machine Learning with Django](https://www.deploymachinelearning.com/).<br>
