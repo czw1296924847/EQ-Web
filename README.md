@@ -33,8 +33,8 @@ The Dataset used in our paper can be downloaded from [https://github.com/smousav
 
 ### 1. Generating Django Model
 ```
-python manager.py makemigrations
-python manager.py migrate
+python manager.py makemigrations estimate
+python manager.py migrate estimate
 ```
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/generate_model.png)<br>
 We have defined three Django Models, including<br>
