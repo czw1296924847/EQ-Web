@@ -5,8 +5,10 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.nn import Parameter
-from .models import MagModel, ModelStatus
+from .models import DlModel, DlModelStatus
 from django.db import transaction
+import sys
+sys.path.append("..")
 import func.net as net
 import func.process as pro
 
@@ -98,6 +100,8 @@ def load_data(root, chunk_name, data_size, idx, device, sm_scale):
     """
     data = torch.load(osp.join(root, str(data_size), "data.pt"))
     index = torch.load(osp.join(root, str(data_size), "index.pt"))
+    if torch.is_tensor(index):
+        index = index.numpy()
     df = pd.read_csv(osp.join(root, chunk_name + ".csv"))
     df = df.iloc[index, :]
 
@@ -155,9 +159,9 @@ def init_model_process(model_name):
     """
     initialize the metrics before model training
     """
-    model = ModelStatus.objects.get(name=model_name)
-    model.process = ""
-    model.save()
+    model_status = DlModelStatus.objects.get(name=model_name)
+    model_status.process = ""
+    model_status.save()
     return None
 
 
@@ -165,9 +169,9 @@ def update_model_process(model_name, epoch, rmse, r2):
     """
     update the metrics during model training process
     """
-    model = ModelStatus.objects.get(name=model_name)
-    model.process = "epoch:{},rmse:{:.4f},r2:{:.4f}".format(epoch, rmse, r2)
-    model.save()
+    model_status = DlModelStatus.objects.get(name=model_name)
+    model_status.process = "epoch:{},rmse:{:.4f},r2:{:.4f}".format(epoch, rmse, r2)
+    model_status.save()
     return None
 
 
@@ -193,8 +197,8 @@ class MagInfoNet(Net):
         init_model_process(model_name)
         self.pre_train(input_data, model_name)
         self.model = ei_ew_device(self.model_name, self.model, self.device)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_train, self.device, self.sm_scale)
         ps_at, p_t = self.get_pt(df)
         dataset = pro.SelfData(data, sm, ps_at, p_t)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
@@ -230,16 +234,17 @@ class MagInfoNet(Net):
             update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test, self.model)
+        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test, self.model)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
 
     def testing(self, input_data, model_name):
         self.pre_test(input_data, model_name)
         self.model = ei_ew_device(self.model_name, self.model, self.device)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_test,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_test, self.device, self.sm_scale)
         ps_at, p_t = self.get_pt(df)
         dataset = pro.SelfData(data, sm, ps_at, p_t)
         loader = DataLoader(dataset, batch_size=64, shuffle=True)
@@ -264,8 +269,9 @@ class MagInfoNet(Net):
         loss_curve.append((rmse ** 2))
         print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
 
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test)
+        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
 
@@ -279,8 +285,8 @@ class EQGraphNet(Net):
         init_model_process(model_name)
         self.pre_train(input_data, model_name)
         self.model = ei_ew_device(self.model_name, self.model, self.device)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_train, self.device, self.sm_scale)
         dataset = pro.SelfData(data, sm)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
@@ -314,16 +320,17 @@ class EQGraphNet(Net):
             update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test, self.model)
+        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test, self.model)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
 
     def testing(self, input_data, model_name):
         self.pre_test(input_data, model_name)
         self.model = ei_ew_device(self.model_name, self.model, self.device)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_test,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_test, self.device, self.sm_scale)
         dataset = pro.SelfData(data, sm)
         loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
@@ -346,8 +353,9 @@ class EQGraphNet(Net):
         loss_curve.append((rmse ** 2))
         print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
 
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test)
+        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
 
@@ -360,8 +368,8 @@ class MagNet(Net):
     def training(self, input_data, model_name):
         init_model_process(model_name)
         self.pre_train(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_train, self.device, self.sm_scale)
         dataset = pro.SelfData(data, sm)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
@@ -395,15 +403,16 @@ class MagNet(Net):
             update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test, self.model)
+        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test, self.model)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
 
     def testing(self, input_data, model_name):
         self.pre_test(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_test,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_test, self.device, self.sm_scale)
         dataset = pro.SelfData(data, sm)
         loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
@@ -426,8 +435,9 @@ class MagNet(Net):
         loss_curve.append((rmse ** 2))
         print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
 
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test)
+        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
 
@@ -466,8 +476,8 @@ class CREIME(Net):
     def training(self, input_data, model_name):
         init_model_process(model_name)
         self.pre_train(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_train, self.device, self.sm_scale)
         x, y = self.get_xy(data, df, sm, 125)
         dataset = pro.SelfData(x, y, sm)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
@@ -502,15 +512,16 @@ class CREIME(Net):
             update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test, self.model)
+        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test, self.model)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
 
     def testing(self, input_data, model_name):
         self.pre_test(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_test,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_test, self.device, self.sm_scale)
 
         x, y = self.get_xy(data, df, sm, 125)
         dataset = pro.SelfData(x, y, sm)
@@ -535,8 +546,9 @@ class CREIME(Net):
         loss_curve.append((rmse ** 2))
         print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
 
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test)
+        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
 
@@ -549,8 +561,8 @@ class ConvNetQuakeINGV(Net):
     def training(self, input_data, model_name):
         init_model_process(model_name)
         self.pre_train(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_train,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_train, self.device, self.sm_scale)
         dataset = pro.SelfData(data, sm)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
@@ -584,15 +596,16 @@ class ConvNetQuakeINGV(Net):
             update_model_process(model_name, epoch, rmse, r2)
             print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
 
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test, self.model)
+        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test, self.model)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
 
     def testing(self, input_data, model_name):
         self.pre_test(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size, self.idx_test,
-                                                   self.device, self.sm_scale)
+        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                   self.idx_test, self.device, self.sm_scale)
         dataset = pro.SelfData(data, sm)
         loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
@@ -615,7 +628,8 @@ class ConvNetQuakeINGV(Net):
         loss_curve.append((rmse ** 2))
         print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
 
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred, loss_curve, sm_scale,
-                        self.chunk_name, self.data_size_train, self.data_size_test)
+        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test)
 
         return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)

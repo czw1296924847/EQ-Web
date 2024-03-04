@@ -9,44 +9,36 @@ class User(models.Model):
         return self.username
 
 
-class MagModel(models.Model):
+class DlModel(models.Model):
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=1000)
-    code = models.CharField(max_length=50000)
-    version = models.CharField(max_length=128)
+    version = models.CharField(max_length=128, default="0.0.1")
     owner = models.CharField(max_length=128)
-    situation = models.CharField(max_length=128)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    created_at = models.DateField(auto_now_add=True)
+    situation = models.CharField(max_length=128, default="Free")
+    path_data = models.CharField(max_length=128, blank=True)
+    library = models.CharField(max_length=5000, blank=True)
+    code_data = models.CharField(max_length=50000, blank=True)
+    code_model = models.CharField(max_length=50000, blank=True)
+    code_train = models.CharField(max_length=50000, blank=True)
+    code_test = models.CharField(max_length=50000, blank=True)
+    code_run = models.CharField(max_length=50000, blank=True)
+
+    def to_dict(self):
+        return {field.name: getattr(self, field.name) for field in self._meta.fields}
+
+    def __str__(self):
+        return self.name
 
 
-class ModelStatus(models.Model):
+class DlModelStatus(models.Model):
     name = models.CharField(max_length=128)
     process = models.CharField(max_length=50000)
+
+    def to_dict(self):
+        return {field.name: getattr(self, field.name) for field in self._meta.fields}
 
 
 class Feature(models.Model):
     param = models.CharField(max_length=128)
     description = models.CharField(max_length=1000)
-
-
-class EndPoint(models.Model):
-    name = models.CharField(max_length=128)
-    owner = models.CharField(max_length=128)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
-
-
-class MagStatus(models.Model):
-    status = models.CharField(max_length=128)
-    active = models.BooleanField()
-    created_by = models.CharField(max_length=128)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
-    parent_model = models.ForeignKey(MagModel, on_delete=models.CASCADE, related_name="status")
-
-
-class MagRequest(models.Model):
-    input_data = models.CharField(max_length=10000)
-    full_response = models.CharField(max_length=10000)
-    response = models.CharField(max_length=10000)
-    feedback = models.CharField(max_length=10000, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
-    parent_model = models.ForeignKey(MagModel, on_delete=models.CASCADE)

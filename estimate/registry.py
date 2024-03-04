@@ -1,7 +1,7 @@
 from .models import *
 
 
-class MagRegistry:
+class DlRegistry:
     """
     Initialize Magnitude Estimation Model, when starting service
     """
@@ -10,34 +10,32 @@ class MagRegistry:
         self.models = {}
         self.users = {}
 
-    def add_model(self, model_object, model_name, model_status,
-                  model_version, model_owner, model_situation, model_description, model_code):
+    def add_model(self, model_object, name, description, owner, path_data, library,
+                  code_data, code_model, code_train, code_test, code_run):
 
-        if not MagModel.objects.filter(name=model_name).exists():
-            database_object, model_created = MagModel.objects.get_or_create(
-                name=model_name,
-                description=model_description,
-                code=model_code,
-                version=model_version,
-                owner=model_owner,
-                situation=model_situation,
+        if not DlModel.objects.filter(name=name).exists():
+            database_object, created = DlModel.objects.get_or_create(
+                name=name,
+                description=description,
+                owner=owner,
+                path_data=path_data,
+                library=library,
+                code_data=code_data,
+                code_model=code_model,
+                code_train=code_train,
+                code_test=code_test,
+                code_run=code_run,
             )
-            if model_created:
-                model_status = ModelStatus(name=model_name, process="")
-                model_status.save()
-
-                mag_status = MagStatus(status=model_status,
-                                       created_by=model_owner,
-                                       parent_model=database_object,
-                                       active=True)
-                mag_status.save()
+            if created:
+                status = DlModelStatus(name=name, process="")
+                status.save()
                 database_object.save()
 
         else:
-            database_object, _ = MagModel.objects.get_or_create(name=model_name)
+            database_object, _ = DlModel.objects.get_or_create(name=name)
 
         self.models[database_object.id] = model_object
-        print("Successfully Load Model: {}".format(model_name))
+        print("Successfully Load Model: {}".format(name))
         return None
 
     def add_user(self, username, password):
@@ -51,15 +49,17 @@ class MagRegistry:
         return None
 
     def add_feature(self, param, description):
+        """
+        add seismic feature in chunk.csv
+        """
         if not Feature.objects.filter(param=param, description=description).exists():
             Feature.objects.create(param=param, description=description)
         return None
 
     def init_info(self):
         """
-        Initialize some information
-        :return:
+        Initialize model information
         """
-        MagModel.objects.all().update(situation="Free")
+        DlModel.objects.all().update(situation="Free")
         # ModelStatus.objects.all().update(process="")
         return None

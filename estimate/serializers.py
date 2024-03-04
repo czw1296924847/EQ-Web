@@ -3,50 +3,40 @@ from rest_framework import serializers
 from .models import *
 
 
-class EndPointSerializer(serializers.ModelSerializer):
+class DlModelSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EndPoint
-        read_only_fields = ("id", "name", "owner", "created_at")
-        fields = read_only_fields
-
-
-class MagModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MagModel
-        fields = ("pk", "name", "description", "code",
-                  "version", "owner", "created_at", "situation")
+        model = DlModel
+        fields = ('pk', 'name', 'description', 'version', 'owner', 'created_at', 'situation', 'path_data',
+                  'library', 'code_data', 'code_model', 'code_train', 'code_test', 'code_run')
         extra_kwargs = {
-            'code': {'required': False},
             'version': {'required': False},
             'created_at': {'required': False},
             'situation': {'required': False},
-            'process': {'required': False},
+            'path_data': {'required': False},
+            'code_data': {'required': False},
+            'library': {'required': False},
+            'code_model': {'required': False},
+            'code_train': {'required': False},
+            'code_test': {'required': False},
+            'code_run': {'required': False},
         }
-
-
-class MagStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MagStatus
-        read_only_fields = ("id", "active")
-        fields = ("id", "active", "status", "created_by", "created_at", "parent_model")
-
-
-class MagRequestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MagRequest
-        read_only_fields = ("id", "input_data", "full_response", "response", "created_at", "parent_model",)
-        fields = ("id", "input_data", "full_response", "response", "feedback", "created_at", "parent_model",)
 
 
 class FeatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feature
-        fields = ("pk", "param", "description")
+        fields = ('pk', 'param', 'description')
 
 
 class PointSerializer(serializers.Serializer):
     x = serializers.FloatField()
     y = serializers.FloatField()
+
+
+class SourceSerializer(serializers.Serializer):
+    Longitude = serializers.FloatField()
+    Latitude = serializers.FloatField()
+    Magnitude = serializers.FloatField()
 
 
 class ResultSerializer(serializers.Serializer):
