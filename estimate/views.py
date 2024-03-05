@@ -367,9 +367,8 @@ class ModelOptView(views.APIView):
         :param pk: Primary Key
         :return:
         """
-        default_models = ["MagInfoNet", "EQGraphNet", "MagNet", "CREIME", "ConvNetQuakeINGV"]
         model = get_model_by_pk(pk)
-        if model.name in default_models:
+        if model.name in DEFAULT_MODELS:
             return Response("Cannot delete default model", status=status.HTTP_403_FORBIDDEN)
         model.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -549,6 +548,27 @@ class LoginView(views.APIView):
         else:
             print("username: {}, password: {}, 密码错误".format(username, password))
             return Response({"msg": "password_error"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+"""
+ViewSet for API visible
+"""
+class BaseViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
+    pass
+
+class DlModelViewSet(BaseViewSet):
+    serializer_class = DlModelSerializer
+    queryset = DlModel.objects.all()
+
+
+class DlModelStatusViewSet(BaseViewSet):
+    serializer_class = DlModelStatusSerializer
+    queryset = DlModelStatus.objects.all()
+
+
+class FeatureViewSet(BaseViewSet):
+    serializer_class = FeatureSerializer
+    queryset = Feature.objects.all()
 
 
 """

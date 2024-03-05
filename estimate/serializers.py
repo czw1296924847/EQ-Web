@@ -22,6 +22,12 @@ class DlModelSerializer(serializers.ModelSerializer):
         }
 
 
+class DlModelStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlModelStatus
+        fields = ('pk', 'name', 'process')
+
+
 class FeatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feature
