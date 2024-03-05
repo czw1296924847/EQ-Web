@@ -39,23 +39,16 @@ python manager.py migrate estimate
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/generate_model.png)<br>
 We have defined three Django Models, including<br>
 - **DlModel**:<br>
-Deep Learning Model information, including `name`, `description`, `version`, `owner`, `created_at`, `situation`, `path_data`, `library`, `code_data`, `code_model`, `code_train`, `code_test`, `code_run` <br>
-<!---
-![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/MagModel.png)<br>
--->
+The information of Deep learning Model, including `name`, `description`, `version`, `owner`, `created_at`, `situation`, `path_data`, `library`, `code_data`, `code_model`, `code_train`, `code_test`, `code_run` <br>
 
 - **DlModelStatus**:<br>
-Deep Learning Model Status information, including `name`, `process`, `created_by`, `parent_model` <br>
-<!---
-![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/MagStatus.png)<br>
+The status of Deep learning Model, including `name`, `process` <br>
 
+- **Feature**:<br>
+The param name and desription of features in [STEAD](https://github.com/smousavi05/STEAD), including `param`, `description` <br>
 
-- **MagRequest**:<br>
-Requests to model,   including `input_data`, `full_response`, `response`, `feedback`, `created_by`, `parent_model`
-<!---
-![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/MagRequest.png)<br>
-
--->
+- **User**:<br>
+The information of allowed users, including `username`, `password` <br>
 
 ### 2. Starting Service
 To start the web server, you should use
