@@ -83,18 +83,14 @@ Alternatively, you can access it from another device by using its subnet {iP} wi
 where `model_name` is the `name` value of [DlModel](#section-DlModel), and provide example JSON input:
 ```
 {
-    "network": "EQGraphNet",
     "device": "cuda:1",
     "lr": 0.0005,
-    "decay": 0.0005,
     "batch_size": 64,
-    "epochs": 100,
+    "epochs": 10,
     "train_ratio": 0.75,
-    "m": 100,
-    "sm_scale": ["ml"],
-    "name": "chunk2",
-    "root": "/home/chenziwei2021/standford_dataset",
-    "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
+    "data_size": 1000,
+    "sm_scale": "ml",
+    "chunk_name": "chunk2",
 }
 ```
 and click the $\text{\color{blue}{POST}}$ button, the model starts training <br>
