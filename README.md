@@ -79,7 +79,7 @@ Alternatively, you can access it from another device by using its subnet {iP} wi
 
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/train_before.png)<br>
 
-where `model_name' is the `name` value of [DlModel(#section-DlModel), and provide example JSON input:
+where `model_name` is the `name` value of [DlModel](#section-DlModel), and provide example JSON input:
 ```
 {
     "network": "EQGraphNet",
