@@ -1,5 +1,5 @@
 # EQ-Web-BackEnd
-**EQ-Web-BackEnd** sssss is a web backend used for seismology including magnitude estimation and so on. <br>
+**EQ-Web-BackEnd** is a web backend used for seismology including magnitude estimation and so on. <br>
 But in reality, **EQ-Web-BackEnd**  can be extended to any deep learning or machine learning models. <br>
 
 It can also serve as the backend framework for [EQ-Web-FrontEnd](https://github.com/zw-Ch/EQ-Web-FrontEnd). <br>
@@ -38,20 +38,14 @@ python manager.py migrate estimate
 ```
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/generate_model.png)<br>
 We have defined three Django Models, including<br>
-- **EndPoint**:<br>
-API endpoints,       including `name`, `owner`, `created_at` <br>
-<!---
-![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/EndPoint.png)<br>
--->
-
-- **MagModel**:<br>
-Model information,   including `name`, `description`, `code`, `version`, `owner`, `created_at`, `parent_endpoints` <br>
+- **DlModel**:<br>
+Deep Learning Model information, including `name`, `description`, `version`, `owner`, `created_at`, `situation`, `path_data`, `library`, `code_data`, `code_model`, `code_train`, `code_test`, `code_run` <br>
 <!---
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/MagModel.png)<br>
 -->
 
-- **MagStatus**:<br>
-Model status,       including `status`, `active`, `created_by`, `parent_model` <br>
+- **DlModelStatus**:<br>
+Deep Learning Model Status information, including `name`, `process`, `created_by`, `parent_model` <br>
 <!---
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/MagStatus.png)<br>
 
