@@ -53,7 +53,7 @@ The information of allowed users, including `username`, `password` <br>
 ### 2. Starting Service
 To start the web server, you should use
 ```
-python manager.py runserver 0.0.0.0 8000
+python manager.py runserver 0.0.0.0:8000
 ```
 then in backgroudn system, you can see <br>
 
