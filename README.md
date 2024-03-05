@@ -111,14 +111,10 @@ You can view the model training process in background system <br>
 and provide example JSON input:
 ```
 {
-    "network": "EQGraphNet",
-    "device": "cuda:1",
     "train_ratio": 0.75,
-    "m": 100,
-    "sm_scale": ["ml"],
-    "name": "chunk2",
-    "root": "/home/chenziwei2021/standford_dataset",
-    "re_ad": "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
+    "data_size": 1000,
+    "sm_scale": "ml",
+    "chunk_name": "chunk2"
 }
 ```
 and click the $\text{\color{blue}{POST}}$ button, the model starts testing <br>
@@ -133,17 +129,13 @@ You can view the model testing process in background system <br>
 
 ### 6. Explain Meaning of Parameters
 ```
-network:      the used model, including "EQGraphNet", "MagInfoNet", "MagNet", "ConvNetQuakeINGV", "CREIME"
 device:       the device of Pytorch model, including "cpu", "cuda:0", "cuda:1"
 lr:           the learning rate of model training, default 0.0005
-decay:        the weight decay of model training, default 0.0005
 batch_size:   batch number for Dataloader, default 64
 train_ratio:  ration of training set, default 0.75
-m:            the number of data set, defalut 200000
-sm_scale:     magnitude scale, including ["ml"], ["md"], ["ml", "md"]
-name:         the name of STEAD chunk, including "chunk2", "chunk3", "chunk4"
-root:         the directory of data set, defalut "/home/chenziwei2021/standford_dataset"
-re_ad:        the directory of saved model, default "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
+data_size:    the size of data set, defalut 200000
+sm_scale:     magnitude scale style, including ["ml"], ["md"], ["ml", "md"]
+chunk_name:         the name of STEAD chunk, including "chunk2", "chunk3", "chunk4"
 ```
 
 ## Problems and Solutions
@@ -166,8 +158,8 @@ rm db.sqlite3
 ```
 Re-execute the command to generate Django database, then restart the server
 ```
-python manager migrate
-python manager runserver
+python manager migrate estimate
+python manager runserver 0.0.0.0:8000
 ```
 
 
