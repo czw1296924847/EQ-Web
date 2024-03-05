@@ -38,7 +38,8 @@ python manager.py migrate estimate
 ```
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/generate_model.png)<br>
 We have defined three Django Models, including<br>
-<a name="section-DlModel"></a>- **DlModel**:<br>
+- **DlModel**:<br>
+<a name="section-DlModel"></a>
 The information of Deep learning Model, including `name`, `description`, `version`, `owner`, `created_at`, `situation`, `path_data`, `library`, `code_data`, `code_model`, `code_train`, `code_test`, `code_run` <br>
 
 - **DlModelStatus**:<br>
