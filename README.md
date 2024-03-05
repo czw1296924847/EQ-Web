@@ -276,9 +276,3 @@ Here we provide technical reference for APIs. They will describe the usage of th
 - **ModelTestView**: View of web page for model testing <br>
 `post`: when you click the $\text{\color{blue}{POST}}$ button, go to this function and start model testing
 
-```
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-getconf GNU_LIBC_VERSION
-npx nvm install v16.20.2
-```
-In our example, the version of glibc is 2.27, so we download v16.20.2, and please add `npx` if you are not root.
