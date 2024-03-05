@@ -38,7 +38,7 @@ python manager.py migrate estimate
 ```
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/generate_model.png)<br>
 We have defined three Django Models, including<br>
-- **DlModel**:<br>
+<a name="section-DlModel"></a>- **DlModel**:<br>
 The information of Deep learning Model, including `name`, `description`, `version`, `owner`, `created_at`, `situation`, `path_data`, `library`, `code_data`, `code_model`, `code_train`, `code_test`, `code_run` <br>
 
 - **DlModelStatus**:<br>
@@ -71,15 +71,15 @@ In our example, host = 127.0.0.1 and port = 8000. Then you will see <br>
 Alternatively, you can access it from another device by using its subnet {iP} within the local area network. By Going to the page <br>
 
 ```
-{subnet IP}:{port}/estimate/
+{ip}:{port}/estimate/
 ```
 
 ### 4. Training Model
-<a name="section-train"></a>  Go to `http://127.0.0.1:8000/estimate/magnitude_estimator/train` <br>
+<a name="section-train"></a>  Go to `http://{ip}:{port}/estimate/{model_name}/train` <br>
 
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/train_before.png)<br>
 
-and provide example JSON input:
+where `model_name' is the `name` value of [DlModel(#section-DlModel), and provide example JSON input:
 ```
 {
     "network": "EQGraphNet",
