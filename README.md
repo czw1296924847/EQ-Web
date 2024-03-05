@@ -104,7 +104,7 @@ You can view the model training process in background system <br>
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/train_process.png)
 
 ### 5. Testing Model
-<a name="section-test"></a> After training some model, go to `http://127.0.0.1:8000/estimate/magnitude_estimator/test` <br>
+<a name="section-test"></a> After training some model, go to `http://{ip}:{port}/estimate/{model_name}/test` <br>
 
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/test_before.png)<br>
 
@@ -131,11 +131,11 @@ You can view the model testing process in background system <br>
 ```
 device:       the device of Pytorch model, including "cpu", "cuda:0", "cuda:1"
 lr:           the learning rate of model training, default 0.0005
-batch_size:   batch number for Dataloader, default 64
-train_ratio:  ration of training set, default 0.75
-data_size:    the size of data set, defalut 200000
-sm_scale:     magnitude scale style, including ["ml"], ["md"], ["ml", "md"]
-chunk_name:         the name of STEAD chunk, including "chunk2", "chunk3", "chunk4"
+batch_size:   the batch size for Dataloader, default 64
+train_ratio:  the ration of training set, default 0.75
+data_size:    the size of data set, defalut 1000
+sm_scale:     the magnitude scale style, including ["ml"], ["md"], ["ml", "md"]
+chunk_name:   the chunk of STEAD, including "chunk2", "chunk3", "chunk4"
 ```
 
 ## Problems and Solutions
