@@ -90,7 +90,7 @@ where `model_name` is the `name` value of [DlModel](#section-DlModel), and provi
     "train_ratio": 0.75,
     "data_size": 1000,
     "sm_scale": "ml",
-    "chunk_name": "chunk2",
+    "chunk_name": "chunk2"
 }
 ```
 and click the $\text{\color{blue}{POST}}$ button, the model starts training <br>
