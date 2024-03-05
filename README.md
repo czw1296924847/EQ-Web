@@ -68,7 +68,9 @@ then you will see <br>
 
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/root_page.png)<br>
 
-In our example, host = 127.0.0.1 and port = 8000.
+In our example, host = 127.0.0.1 and port = 8000. <br>
+
+Alternatively, you can access it through a subnet IP using another device within the local area network <br>
 
 
 ### 4. Training Model
