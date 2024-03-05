@@ -8,13 +8,13 @@ It can also serve as the backend framework for [EQ-Web-FrontEnd](https://github.
 **EQ-Web-BackEnd**  is based on [Django](https://docs.djangoproject.com) and [Django REST framework](https://www.django-rest-framework.org/). You can obtain relevant tutorials from [Machine Learning with Django](https://www.deploymachinelearning.com/).<br>
 Firstly please create a virtual environment for yourself<br>
 ```
-conda create -n your-env-name python=3.9
+conda create -n your-env-name python=3.11
 ```
 Then, there are some Python packages need to be installed<br>
 ```
-conda install pytorch torchvision torchaudio cudatoolkit=11.3
+conda install pytorch torchvision torchaudio cudatoolkit=12.1
 conda install pyg -c pyg
-conda install h5py==2.10.0
+conda install h5py
 conda install django
 conda install djangorestframework
 conda install markdown
