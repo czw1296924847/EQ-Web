@@ -168,7 +168,7 @@ If you have not trained the model before testing, you will <br>
 
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/not_train.png)<br>
 
-where the `CREIME` haven't been trained.
+where the `EQGraphNet` haven't been trained on given parameters.
 
 
 ## Extension
