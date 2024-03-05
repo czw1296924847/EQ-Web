@@ -70,8 +70,15 @@ then you will see <br>
 
 In our example, host = 127.0.0.1 and port = 8000. <br>
 
-Alternatively, you can access it through a subnet IP using another device within the local area network <br>
+Alternatively, you can access it through a subnet IP using another device within the local area network, by Going to the page <br>
 
+```
+10.181.8.163:8000/estimate/
+```
+
+![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/root_page_external.png)<br>
+
+In our example, host = 10.181.8.163 and port = 8000. <br>
 
 ### 4. Training Model
 <a name="section-train"></a>  Go to `http://127.0.0.1:8000/estimate/magnitude_estimator/train` <br>
