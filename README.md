@@ -64,19 +64,15 @@ For Linux system, you can access web pages by using <br>
 ```
 xdg-open http://{host}:{port}/estimate
 ```
-then you will see <br>
+In our example, host = 127.0.0.1 and port = 8000. Then you will see <br>
 
 ![image](https://github.com/zw-Ch/EQ-Web-BackEnd/blob/main/image/root_page.png)<br>
 
-In our example, host = 127.0.0.1 and port = 8000. <br>
-
-Alternatively, you can access it through a subnet IP using another device within the local area network, by Going to the page <br>
+Alternatively, you can access it from another device by using its subnet {iP} within the local area network. By Going to the page <br>
 
 ```
-10.181.8.163:8000/estimate/
+{subnet IP}:{port}/estimate/
 ```
-
-In our example, subnet IP = 10.181.8.163 and port = 8000. <br>
 
 ### 4. Training Model
 <a name="section-train"></a>  Go to `http://127.0.0.1:8000/estimate/magnitude_estimator/train` <br>
