@@ -14,6 +14,7 @@ urlpatterns = [
     path('', include(router.urls)),
 
     re_path(r'^run$', RunView.as_view()),
+    re_path(r'^conda$', CondaView.as_view()),
     re_path(r'^models$', ModelListView.as_view()),
     re_path(r'^features$', FeatureListView.as_view()),
     re_path(r'^features/dist$', FeatureDistView.as_view()),

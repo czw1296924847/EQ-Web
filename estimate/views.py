@@ -1,12 +1,9 @@
-from rest_framework.exceptions import APIException
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin, CreateModelMixin, UpdateModelMixin
 from rest_framework import views, status, generics
 from rest_framework.response import Response
 from django.db import transaction
 from django.shortcuts import render
-from celery import shared_task
-import json
 import pandas as pd
 import numpy as np
 import subprocess
@@ -15,7 +12,7 @@ import os
 import os.path as osp
 from .serializers import *
 from .models import *
-from func.process import ROOT, RE_AD, DEFAULT_MODELS, DEFAULT_LIBS, PY_AD
+from func.process import ROOT, RE_AD, DEFAULT_MODELS, DEFAULT_LIBS, PY_AD, CONDA_AD
 from func.process import get_dist, get_lib_by_files, duplicate_lib, is_error
 from func.net import cal_metrics
 
@@ -70,6 +67,59 @@ def get_record(opt):
                 record_one_model.append(record_one_file)
         record.append({'model_name': model_name, 'record': record_one_model})
     return record
+
+
+class CondaView(views.APIView):
+    def get(self, request):
+        """
+        Get information of Anaconda environments
+        """
+
+        env = request.GET.get('env')
+        command = "conda init; conda activate {}; conda list".format(env)
+        result = subprocess.run(command, capture_output=True, text=True, shell=True)
+
+        # Run Error
+        if result.returncode != 0:
+            print("Error:", result.stderr)
+            return Response(result.stderr, status=status.HTTP_502_BAD_GATEWAY)
+
+        # If the param 'env' does not exist, Get current env name
+        if not env:
+            """
+            # Get all envs names
+            envs_path = osp.join(CONDA_AD, "envs")
+            envs = [d for d in os.listdir(envs_path) if osp.isdir(osp.join(envs_path, d))]
+            data = [{'env': env, 'lib': [{'name': '', 'version': ''}]} for env in envs]
+            serializer = CondaSerializer(data=data, many=True)
+            """
+            match = re.search(r'^# packages in environment at (.*?):', result.stdout, re.MULTILINE)
+            if match:
+                env = match.group(1).split('/')[-1]
+                data = [{'env': env, 'lib': [{'name': '', 'version': ''}]}]
+                serializer = CondaSerializer(data=data, many=True)
+                if serializer.is_valid():
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # If the param 'env' exists, Get dependent libraries of 'env'
+        lib = []
+        print(result.stdout)
+        pattern = re.compile(r"# Name.*?\n(.*?)(\n#|\Z)", re.DOTALL)
+        match = pattern.search(result.stdout)
+        if not match:
+            return Response("No Libs", status=status.HTTP_200_OK)
+        lines = match.group(1).strip().split('\n')
+        for line in lines:
+            info = re.match(r"(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", line)
+            if info:
+                name, version, build, channel = info.groups()
+                lib.append({'name': name, 'version': version})
+        data = {'env': env, 'lib': lib}
+        serializer = CondaSerializer(data=data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RunView(views.APIView):

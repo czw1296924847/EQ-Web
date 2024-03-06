@@ -51,3 +51,13 @@ class ResultSerializer(serializers.Serializer):
     rmse = serializers.FloatField()
     e_mean = serializers.FloatField()
     e_std = serializers.FloatField()
+
+
+class LibSerializer(serializers.Serializer):
+    name = serializers.CharField(allow_blank=True)
+    version = serializers.CharField(allow_blank=True)
+
+
+class CondaSerializer(serializers.Serializer):
+    env = serializers.CharField()
+    lib = LibSerializer(many=True)
