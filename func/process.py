@@ -14,6 +14,7 @@ RE_AD = "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/result"
 DATA_AD = "/home/chenziwei2021/pyn/paper/EQGraphNet/web/estimate/static/data"
 WORD_AD = "/home/chenziwei2021/pyn/paper/EQGraphNet/web"
 PY_AD = "/home/chenziwei2021/anaconda3/envs/cmh/bin/python3.11"
+CONDA_AD = "/home/chenziwei2021/anaconda3"
 DEFAULT_MODELS = ["MagInfoNet", "EQGraphNet", "MagNet", "CREIME", "ConvNetQuakeINGV"]
 DEFAULT_LIBS = "import numpy as np\n"
 
