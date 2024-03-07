@@ -76,7 +76,7 @@ class CondaView(views.APIView):
         """
 
         env = request.GET.get('env')
-        command = "conda init; conda activate {}; conda list".format(env)
+        command = "conda list".format(env)
         result = subprocess.run(command, capture_output=True, text=True, shell=True)
 
         # Run Error
