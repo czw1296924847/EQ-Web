@@ -6,6 +6,7 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.nn import Parameter
 from .models import DlModel, DlModelStatus
+from abc import ABC, abstractmethod
 from django.db import transaction
 import sys
 sys.path.append("..")
@@ -13,26 +14,33 @@ import func.net as net
 import func.process as pro
 
 
-class Net:
+class Net(ABC):
     def __init__(self):
         self.lr = 0.0005
         self.decay = 0.0005
         self.batch_size = 64
-        self.epochs = 100
+        self.epochs = 70
         self.root = pro.ROOT
         self.re_ad = pro.RE_AD
         self.device = "cpu"
-        self.data_size = 100
+        self.data_size = 1000
         self.chunk_name = "chunk2"
         self.sm_scale = ["ml"]
-        self.data_size_train = 75
-        self.data_size_test = 25
+        self.data_size_train = 750
+        self.data_size_test = 250
         self.model_name = "EQGraphNet"
         self.idx_train = None
         self.idx_test = None
-        self.model = None
+        self.model = self.init_model()
 
-    def pre_train(self, input_data, model_name):
+    @abstractmethod
+    def init_model(self):
+        """
+        Initialize the instance of model
+        """
+        return None
+
+    def read_train_params(self, input_data, model_name):
         """
         read params before model training
         """
@@ -62,7 +70,7 @@ class Net:
         self.idx_train, _ = pro.get_train_or_test_idx(self.data_size, self.data_size_train)
         return None
 
-    def pre_test(self, input_data, model_name):
+    def read_test_params(self, input_data, model_name):
         """
         read params before model testing
         """
@@ -93,6 +101,107 @@ class Net:
         self.model.to(self.device)
         return None
 
+    def load(self, train):
+        """
+        load Training or Testing set
+
+        :param train: bool, True for Training set, False for Testing set
+        :return: data, sm, df, sm_scale, and idx_sm
+        """
+        if train:
+            data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                       self.idx_train, self.device, self.sm_scale)
+        else:
+            data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
+                                                       self.idx_test, self.device, self.sm_scale)
+        return data, sm, df, sm_scale, idx_sm
+
+    @abstractmethod
+    def read_data(self, train):
+        """
+        Read data for model training or testing
+
+        :param train: bool, True for Training set, False for Testing set
+        :return: loader (Pytorch Dataloader), sm_scale (str)
+        """
+        return None, None
+
+    @abstractmethod
+    def train_method(self, true, pred, train_loader, optimizer, criterion):
+        """
+        model training method during one epoch
+
+        :return: true magnitudes and predicted results
+        """
+        return true, pred
+
+    def training(self, input_data, model_name):
+        """
+        model training
+
+        :return: Metrics of predictive performance
+        """
+        init_model_process(model_name)
+        self.read_train_params(input_data, model_name)
+        self.model = ei_ew_device(self.model_name, self.model, self.device)
+        train_loader, sm_scale = self.read_data(train=True)
+        criterion = torch.nn.MSELoss().to(self.device)
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.decay)
+        self.model.to(self.device)
+
+        true, pred, loss_curve = [], [], []
+        print("\n\n" + "=" * 20 + " Start {} Training ".format(self.model_name) + "=" * 20 + "\n")
+        for epoch in range(self.epochs):
+
+            true, pred = self.train_method(true, pred, train_loader, optimizer, criterion)
+            rmse = net.cal_rmse_one_arr(true, pred)
+            r2 = net.cal_r2_one_arr(true, pred)
+            loss_curve.append((rmse ** 2))
+            update_model_process(model_name, epoch, rmse, r2)
+            print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
+
+        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test, self.model)
+
+        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
+
+    @abstractmethod
+    def test_method(self, true, pred, test_loader):
+        """
+        model testing method during one epoch
+
+        :return: true magnitudes and predicted results
+        """
+        return true, pred
+
+    def testing(self, input_data, model_name):
+        """
+        model testing
+
+        :return: Metrics of predictive performance
+        """
+        init_model_process(model_name)
+        self.read_test_params(input_data, model_name)
+        self.model = ei_ew_device(self.model_name, self.model, self.device)
+        test_loader, sm_scale = self.read_data(train=False)
+
+        true, pred, loss_curve = [], [], []
+        print("\n\n" + "=" * 20 + "Start {} Testing".format(self.model_name) + "=" * 20 + "\n")
+
+        true, pred = self.test_method(true, pred, test_loader)
+        rmse = net.cal_rmse_one_arr(true, pred)
+        r2 = net.cal_r2_one_arr(true, pred)
+        loss_curve.append((rmse ** 2))
+        update_model_process(model_name, 0, rmse, r2)
+        print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
+
+        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
+                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
+                        self.data_size_test)
+
+        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
+
 
 def load_data(root, chunk_name, data_size, idx, device, sm_scale):
     """
@@ -113,7 +222,7 @@ def load_data(root, chunk_name, data_size, idx, device, sm_scale):
 
 def get_metrics(true, pred, model_name, sm_scale, data_size):
     """
-    calculate result for response
+    calculate result and metrics for response
     """
     r2, rmse, e_mean, e_std = net.cal_metrics(true, pred)
     num_show, num_round = 15, 2
@@ -150,8 +259,6 @@ def ei_ew_device(model_name, model, device):
         model.ei8, model.ew8 = model.ei8.to(device), Parameter(model.ew8.float().to(device))
         model.ei9, model.ew9 = model.ei9.to(device), Parameter(model.ew9.float().to(device))
         model.ei10, model.ew10 = model.ei10.to(device), Parameter(model.ew10.float().to(device))
-    else:
-        raise TypeError("Unknown type of 'model_name")
     return model
 
 
@@ -176,9 +283,8 @@ def update_model_process(model_name, epoch, rmse, r2):
 
 
 class MagInfoNet(Net):
-    def __init__(self):
-        super().__init__()
-        self.model = net.MagInfoNet("unimp", "ts_un", 1, "cpu")
+    def init_model(self):
+        return net.MagInfoNet("unimp", "ts_un", 1, "cpu")
 
     def get_pt(self, df):
         """
@@ -193,65 +299,36 @@ class MagInfoNet(Net):
         p_t = torch.from_numpy(p_t).float()
         return ps_at, p_t
 
-    def training(self, input_data, model_name):
-        init_model_process(model_name)
-        self.pre_train(input_data, model_name)
-        self.model = ei_ew_device(self.model_name, self.model, self.device)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_train, self.device, self.sm_scale)
+    def read_data(self, train):
+        data, sm, df, sm_scale, idx_sm = self.load(train)
         ps_at, p_t = self.get_pt(df)
         dataset = pro.SelfData(data, sm, ps_at, p_t)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        return loader, sm_scale
 
-        criterion = torch.nn.MSELoss().to(self.device)
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.decay)
-        self.model.to(self.device)
-
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + " Start {} Training ".format(self.model_name) + "=" * 20 + "\n")
-        for epoch in range(self.epochs):
-            for item, (x, y, ps_at, p_t, _) in enumerate(tqdm(loader)):
-                x, y = x.to(self.device), y.to(self.device)
-                ps_at, p_t = ps_at.to(self.device), p_t.to(self.device)
-
-                optimizer.zero_grad()
-                output = self.model(x, ps_at, p_t)
-                loss = criterion(output, y)
-                loss.backward()
-                optimizer.step()
-
-                pred_one = output.detach().cpu().numpy()
-                true_one = y.detach().cpu().numpy()
-                if item == 0:
-                    pred = pred_one
-                    true = true_one
-                else:
-                    pred = np.concatenate((pred, pred_one), axis=0)
-                    true = np.concatenate((true, true_one), axis=0)
-            rmse = net.cal_rmse_one_arr(true, pred)
-            r2 = net.cal_r2_one_arr(true, pred)
-            loss_curve.append((rmse ** 2))
-            update_model_process(model_name, epoch, rmse, r2)
-            print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
-
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test, self.model)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
-
-    def testing(self, input_data, model_name):
-        self.pre_test(input_data, model_name)
-        self.model = ei_ew_device(self.model_name, self.model, self.device)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_test, self.device, self.sm_scale)
-        ps_at, p_t = self.get_pt(df)
-        dataset = pro.SelfData(data, sm, ps_at, p_t)
-        loader = DataLoader(dataset, batch_size=64, shuffle=True)
-
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + "Start {} Testing".format(self.model_name) + "=" * 20 + "\n")
+    def train_method(self, true, pred, loader, optimizer, criterion):
         for item, (x, y, ps_at, p_t, _) in enumerate(tqdm(loader)):
+            x, y = x.to(self.device), y.to(self.device)
+            ps_at, p_t = ps_at.to(self.device), p_t.to(self.device)
+
+            optimizer.zero_grad()
+            output = self.model(x, ps_at, p_t)
+            loss = criterion(output, y)
+            loss.backward()
+            optimizer.step()
+
+            pred_one = output.detach().cpu().numpy()
+            true_one = y.detach().cpu().numpy()
+            if item == 0:
+                pred = pred_one
+                true = true_one
+            else:
+                pred = np.concatenate((pred, pred_one), axis=0)
+                true = np.concatenate((true, true_one), axis=0)
+        return true, pred
+
+    def test_method(self, true, pred, test_loader):
+        for item, (x, y, ps_at, p_t, _) in enumerate(tqdm(test_loader)):
             x, y = x.to(self.device), y.to(self.device)
             ps_at, p_t = ps_at.to(self.device), p_t.to(self.device)
 
@@ -264,79 +341,41 @@ class MagInfoNet(Net):
             else:
                 pred = np.concatenate((pred, pred_one), axis=0)
                 true = np.concatenate((true, true_one), axis=0)
-        rmse = net.cal_rmse_one_arr(true, pred)
-        r2 = net.cal_r2_one_arr(true, pred)
-        loss_curve.append((rmse ** 2))
-        print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
-
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
+        return true, pred
 
 
 class EQGraphNet(Net):
-    def __init__(self):
-        super().__init__()
-        self.model = net.EQGraphNet("gcn", "ts_un", 1, "cpu")
+    def init_model(self):
+        return net.EQGraphNet("gcn", "ts_un", 1, "cpu")
 
-    def training(self, input_data, model_name):
-        init_model_process(model_name)
-        self.pre_train(input_data, model_name)
-        self.model = ei_ew_device(self.model_name, self.model, self.device)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_train, self.device, self.sm_scale)
+    def read_data(self, train):
+        data, sm, df, sm_scale, idx_sm = self.load(train)
         dataset = pro.SelfData(data, sm)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        return loader, sm_scale
 
-        criterion = torch.nn.MSELoss().to(self.device)
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.decay)
-        self.model.to(self.device)
+    def train_method(self, true, pred, train_loader, optimizer, criterion):
+        for item, (x, y, _) in enumerate(tqdm(train_loader)):
+            x, y = x.to(self.device), y.to(self.device)
 
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + " Start {} Training ".format(self.model_name) + "=" * 20 + "\n")
-        for epoch in range(self.epochs):
-            for item, (x, y, _) in enumerate(tqdm(loader)):
-                x, y = x.to(self.device), y.to(self.device)
+            optimizer.zero_grad()
+            output = self.model(x)
+            loss = criterion(output, y)
+            loss.backward()
+            optimizer.step()
 
-                optimizer.zero_grad()
-                output = self.model(x)
-                loss = criterion(output, y)
-                loss.backward()
-                optimizer.step()
+            pred_one = output.detach().cpu().numpy()
+            true_one = y.detach().cpu().numpy()
+            if item == 0:
+                pred = pred_one
+                true = true_one
+            else:
+                pred = np.concatenate((pred, pred_one), axis=0)
+                true = np.concatenate((true, true_one), axis=0)
+        return true, pred
 
-                pred_one = output.detach().cpu().numpy()
-                true_one = y.detach().cpu().numpy()
-                if item == 0:
-                    pred = pred_one
-                    true = true_one
-                else:
-                    pred = np.concatenate((pred, pred_one), axis=0)
-                    true = np.concatenate((true, true_one), axis=0)
-            rmse = net.cal_rmse_one_arr(true, pred)
-            r2 = net.cal_r2_one_arr(true, pred)
-            loss_curve.append((rmse ** 2))
-            update_model_process(model_name, epoch, rmse, r2)
-            print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
-
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test, self.model)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
-
-    def testing(self, input_data, model_name):
-        self.pre_test(input_data, model_name)
-        self.model = ei_ew_device(self.model_name, self.model, self.device)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_test, self.device, self.sm_scale)
-        dataset = pro.SelfData(data, sm)
-        loader = DataLoader(dataset, batch_size=64, shuffle=True)
-
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + "Start {} Testing".format(self.model_name) + "=" * 20 + "\n")
-        for item, (x, y, _) in enumerate(tqdm(loader)):
+    def test_method(self, true, pred, test_loader):
+        for item, (x, y, _) in enumerate(tqdm(test_loader)):
             x, y = x.to(self.device), y.to(self.device)
 
             output = self.model(x)
@@ -348,77 +387,41 @@ class EQGraphNet(Net):
             else:
                 pred = np.concatenate((pred, pred_one), axis=0)
                 true = np.concatenate((true, true_one), axis=0)
-        rmse = net.cal_rmse_one_arr(true, pred)
-        r2 = net.cal_r2_one_arr(true, pred)
-        loss_curve.append((rmse ** 2))
-        print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
-
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
+        return true, pred
 
 
 class MagNet(Net):
-    def __init__(self):
-        super().__init__()
-        self.model = net.MagNet()
+    def init_model(self):
+        return net.MagNet()
 
-    def training(self, input_data, model_name):
-        init_model_process(model_name)
-        self.pre_train(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_train, self.device, self.sm_scale)
+    def read_data(self, train):
+        data, sm, df, sm_scale, idx_sm = self.load(train)
         dataset = pro.SelfData(data, sm)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        return loader, sm_scale
 
-        criterion = torch.nn.MSELoss().to(self.device)
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.decay)
-        self.model.to(self.device)
+    def train_method(self, true, pred, train_loader, optimizer, criterion):
+        for item, (x, y, _) in enumerate(tqdm(train_loader)):
+            x, y = x.to(self.device), y.to(self.device)
 
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + " Start {} Training ".format(self.model_name) + "=" * 20 + "\n")
-        for epoch in range(self.epochs):
-            for item, (x, y, _) in enumerate(tqdm(loader)):
-                x, y = x.to(self.device), y.to(self.device)
+            optimizer.zero_grad()
+            output = self.model(x)
+            loss = criterion(output, y)
+            loss.backward()
+            optimizer.step()
 
-                optimizer.zero_grad()
-                output = self.model(x)
-                loss = criterion(output, y)
-                loss.backward()
-                optimizer.step()
+            pred_one = output.detach().cpu().numpy()
+            true_one = y.detach().cpu().numpy()
+            if item == 0:
+                pred = pred_one
+                true = true_one
+            else:
+                pred = np.concatenate((pred, pred_one), axis=0)
+                true = np.concatenate((true, true_one), axis=0)
+        return true, pred
 
-                pred_one = output.detach().cpu().numpy()
-                true_one = y.detach().cpu().numpy()
-                if item == 0:
-                    pred = pred_one
-                    true = true_one
-                else:
-                    pred = np.concatenate((pred, pred_one), axis=0)
-                    true = np.concatenate((true, true_one), axis=0)
-            rmse = net.cal_rmse_one_arr(true, pred)
-            r2 = net.cal_r2_one_arr(true, pred)
-            loss_curve.append((rmse ** 2))
-            update_model_process(model_name, epoch, rmse, r2)
-            print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
-
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test, self.model)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
-
-    def testing(self, input_data, model_name):
-        self.pre_test(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_test, self.device, self.sm_scale)
-        dataset = pro.SelfData(data, sm)
-        loader = DataLoader(dataset, batch_size=64, shuffle=True)
-
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + "Start {} Testing".format(self.model_name) + "=" * 20 + "\n")
-        for item, (x, y, _) in enumerate(tqdm(loader)):
+    def test_method(self, true, pred, test_loader):
+        for item, (x, y, _) in enumerate(tqdm(test_loader)):
             x, y = x.to(self.device), y.to(self.device)
 
             output = self.model(x)
@@ -430,22 +433,12 @@ class MagNet(Net):
             else:
                 pred = np.concatenate((pred, pred_one), axis=0)
                 true = np.concatenate((true, true_one), axis=0)
-        rmse = net.cal_rmse_one_arr(true, pred)
-        r2 = net.cal_r2_one_arr(true, pred)
-        loss_curve.append((rmse ** 2))
-        print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
-
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
+        return true, pred
 
 
 class CREIME(Net):
-    def __init__(self):
-        super().__init__()
-        self.model = net.CREIME()
+    def init_model(self):
+        return net.CREIME()
 
     def cal_mag(self, output):
         output_last = output[:, -10:]
@@ -473,63 +466,35 @@ class CREIME(Net):
         x, y = torch.from_numpy(x).float(), torch.from_numpy(y).float()
         return x, y
 
-    def training(self, input_data, model_name):
-        init_model_process(model_name)
-        self.pre_train(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_train, self.device, self.sm_scale)
+    def read_data(self, train):
+        data, sm, df, sm_scale, idx_sm = self.load(train)
         x, y = self.get_xy(data, df, sm, 125)
         dataset = pro.SelfData(x, y, sm)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        return loader, sm_scale
 
-        criterion = torch.nn.MSELoss().to(self.device)
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.decay)
-        self.model.to(self.device)
+    def train_method(self, true, pred, train_loader, optimizer, criterion):
+        for item, (x, y, sm, _) in enumerate(tqdm(train_loader)):
+            x, y, sm = x.to(self.device), y.to(self.device), sm.to(self.device)
 
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + " Start {} Training ".format(self.model_name) + "=" * 20 + "\n")
-        for epoch in range(self.epochs):
-            for item, (x, y, sm, _) in enumerate(tqdm(loader)):
-                x, y, sm = x.to(self.device), y.to(self.device), sm.to(self.device)
+            optimizer.zero_grad()
+            output = self.model(x)
+            loss = criterion(output, y)
+            loss.backward()
+            optimizer.step()
 
-                optimizer.zero_grad()
-                output = self.model(x)
-                loss = criterion(output, y)
-                loss.backward()
-                optimizer.step()
+            pred_one = self.cal_mag(output).detach().cpu().numpy()
+            true_one = sm.detach().cpu().numpy()
+            if item == 0:
+                pred = pred_one
+                true = true_one
+            else:
+                pred = np.concatenate((pred, pred_one), axis=0)
+                true = np.concatenate((true, true_one), axis=0)
+        return true, pred
 
-                pred_one = self.cal_mag(output).detach().cpu().numpy()
-                true_one = sm.detach().cpu().numpy()
-                if item == 0:
-                    pred = pred_one
-                    true = true_one
-                else:
-                    pred = np.concatenate((pred, pred_one), axis=0)
-                    true = np.concatenate((true, true_one), axis=0)
-            rmse = net.cal_rmse_one_arr(true, pred)
-            r2 = net.cal_r2_one_arr(true, pred)
-            loss_curve.append((rmse ** 2))
-            update_model_process(model_name, epoch, rmse, r2)
-            print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
-
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test, self.model)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
-
-    def testing(self, input_data, model_name):
-        self.pre_test(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_test, self.device, self.sm_scale)
-
-        x, y = self.get_xy(data, df, sm, 125)
-        dataset = pro.SelfData(x, y, sm)
-        loader = DataLoader(dataset, batch_size=64, shuffle=True)
-
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + "Start {} Testing".format(self.model_name) + "=" * 20 + "\n")
-        for item, (x, y, sm, _) in enumerate(tqdm(loader)):
+    def test_method(self, true, pred, test_loader):
+        for item, (x, y, sm, _) in enumerate(tqdm(test_loader)):
             x, y, sm = x.to(self.device), y.to(self.device), sm.to(self.device)
 
             output = self.model(x)
@@ -541,77 +506,41 @@ class CREIME(Net):
             else:
                 pred = np.concatenate((pred, pred_one), axis=0)
                 true = np.concatenate((true, true_one), axis=0)
-        rmse = net.cal_rmse_one_arr(true, pred)
-        r2 = net.cal_r2_one_arr(true, pred)
-        loss_curve.append((rmse ** 2))
-        print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
-
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
+        return true, pred
 
 
 class ConvNetQuakeINGV(Net):
-    def __init__(self):
-        super().__init__()
-        self.model = net.ConvNetQuakeINGV()
+    def init_model(self):
+        return net.ConvNetQuakeINGV()
 
-    def training(self, input_data, model_name):
-        init_model_process(model_name)
-        self.pre_train(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_train, self.device, self.sm_scale)
+    def read_data(self, train):
+        data, sm, df, sm_scale, idx_sm = self.load(train)
         dataset = pro.SelfData(data, sm)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        return loader, sm_scale
 
-        criterion = torch.nn.MSELoss().to(self.device)
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.decay)
-        self.model.to(self.device)
+    def train_method(self, true, pred, train_loader, optimizer, criterion):
+        for item, (x, y, _) in enumerate(tqdm(train_loader)):
+            x, y = x.to(self.device), y.to(self.device)
 
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + " Start {} Training ".format(self.model_name) + "=" * 20 + "\n")
-        for epoch in range(self.epochs):
-            for item, (x, y, _) in enumerate(tqdm(loader)):
-                x, y = x.to(self.device), y.to(self.device)
+            optimizer.zero_grad()
+            output = self.model(x)
+            loss = criterion(output, y)
+            loss.backward()
+            optimizer.step()
 
-                optimizer.zero_grad()
-                output = self.model(x)
-                loss = criterion(output, y)
-                loss.backward()
-                optimizer.step()
+            pred_one = output.detach().cpu().numpy()
+            true_one = y.detach().cpu().numpy()
+            if item == 0:
+                pred = pred_one
+                true = true_one
+            else:
+                pred = np.concatenate((pred, pred_one), axis=0)
+                true = np.concatenate((true, true_one), axis=0)
+        return true, pred
 
-                pred_one = output.detach().cpu().numpy()
-                true_one = y.detach().cpu().numpy()
-                if item == 0:
-                    pred = pred_one
-                    true = true_one
-                else:
-                    pred = np.concatenate((pred, pred_one), axis=0)
-                    true = np.concatenate((true, true_one), axis=0)
-            rmse = net.cal_rmse_one_arr(true, pred)
-            r2 = net.cal_r2_one_arr(true, pred)
-            loss_curve.append((rmse ** 2))
-            update_model_process(model_name, epoch, rmse, r2)
-            print("Epoch: {:03d}  RMSE: {:.4f}  R2: {:.8f}".format(epoch, rmse, r2))
-
-        pro.save_result("train", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test, self.model)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
-
-    def testing(self, input_data, model_name):
-        self.pre_test(input_data, model_name)
-        data, sm, df, sm_scale, idx_sm = load_data(self.root, self.chunk_name, self.data_size,
-                                                   self.idx_test, self.device, self.sm_scale)
-        dataset = pro.SelfData(data, sm)
-        loader = DataLoader(dataset, batch_size=64, shuffle=True)
-
-        pred, true, loss_curve = [], [], []
-        print("\n\n" + "=" * 20 + "Start {} Testing".format(self.model_name) + "=" * 20 + "\n")
-        for item, (x, y, _) in enumerate(tqdm(loader)):
+    def test_method(self, true, pred, test_loader):
+        for item, (x, y, _) in enumerate(tqdm(test_loader)):
             x, y = x.to(self.device), y.to(self.device)
 
             output = self.model(x)
@@ -623,13 +552,4 @@ class ConvNetQuakeINGV(Net):
             else:
                 pred = np.concatenate((pred, pred_one), axis=0)
                 true = np.concatenate((true, true_one), axis=0)
-        rmse = net.cal_rmse_one_arr(true, pred)
-        r2 = net.cal_r2_one_arr(true, pred)
-        loss_curve.append((rmse ** 2))
-        print("RMSE: {:.4f}  R2: {:.8f}".format(rmse, r2))
-
-        pro.save_result("test", osp.join(self.re_ad, str(self.data_size)), true, pred,
-                        loss_curve, sm_scale, self.chunk_name, self.data_size_train,
-                        self.data_size_test)
-
-        return get_metrics(true, pred, self.model_name, self.sm_scale, self.data_size)
+        return true, pred
